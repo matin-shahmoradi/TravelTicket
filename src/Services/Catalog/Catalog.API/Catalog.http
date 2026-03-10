@@ -1,0 +1,21 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfileacc
+
+@test_HostAddress = http://localhost:5246
+@http_Catolog = http://localhost:5000
+
+# GET {{http_Catolog}}/tickets;
+# Accept:application/json;
+
+
+POST {{http_Catolog}}/tickets
+Accept:  
+ {
+   "Origin" : "Tabriz",
+   "Destination": "Mashhad",
+   "Description" "bus ticket from tabriz to mashhad",
+   "Date" : "2026-8-22"
+   "Price": 800000,
+   "TravlerName" : "Dariush bakhtiyari",
+   "TravlerNumber": "09037777777"
+ }
+  
