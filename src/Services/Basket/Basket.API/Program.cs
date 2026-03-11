@@ -1,15 +1,35 @@
-var builder = WebApplication.CreateBuilder(args);
+using Basket.API.Data;
 
+var builder = WebApplication.CreateBuilder(args);
+var assembly = typeof(Program).Assembly;
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(assembly);
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+});
+builder.Services.AddMarten(config =>
+{
+    config.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!);
+}).UseLightweightSessions();
+
+builder.Services.AddCarter();
+builder.Services.AddScoped<IBasketRepository,BasketRepository>();
+builder.Services.AddSwaggerGen(cfg =>
+{
+    
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

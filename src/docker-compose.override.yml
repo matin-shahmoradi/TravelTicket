@@ -24,3 +24,15 @@ services:
         - "5433:5432"
     volumes:
         - postgres_data:/var/lib/postgresql
+  basketDb:
+    image: postgres
+    container_name: basketDb
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=CatalogDb
+    restart: always
+    ports:
+        - "5434:5432"
+    volumes:
+        - basket_postgres:/var/lib/postgresql
