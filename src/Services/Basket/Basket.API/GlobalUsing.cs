@@ -2,6 +2,8 @@
 global using Marten;
 global using MediatR;
 global using Basket.API.Model;
+global using Basket.API.Data;
+global using Basket.API.Common.Dtos;
 global using BuildingBlocks;
 global using BuildingBlocks.CQRS;
 global using BuildingBlocks.Behaviors;

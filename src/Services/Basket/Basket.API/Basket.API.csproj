@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Basket\StoreBasket\" />
+    <Folder Include="Basket\DeleteBasket\" />
   </ItemGroup>
 
 </Project>
