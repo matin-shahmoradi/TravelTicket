@@ -15,14 +15,21 @@ builder.Services.AddMediatR(config =>
 builder.Services.AddMarten(config =>
 {
     config.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!);
+    config.Schema.For<ShoppingCart>().Identity(x => x.TravlerNumber);
 }).UseLightweightSessions();
+builder.Services.AddStackExchangeRedisCache(config =>
+{
+    config.Configuration = builder.Configuration.GetConnectionString("Redis");
+    config.InstanceName = "BasketRedis";
+});
+
+builder.Services.AddScoped<IBasketRepository,BasketRepository>();
+builder.Services.Decorate<IBasketRepository,CachedBasketRepository>();
 
 builder.Services.AddCarter();
-builder.Services.AddScoped<IBasketRepository,BasketRepository>();
-builder.Services.AddSwaggerGen(cfg =>
-{
-    
-});
+
+builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +43,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapCarter();
+app.MapGet("/", () => "Basket.API");
 
 app.Run();
