@@ -1,6 +1,4 @@
-﻿using Basket.API.Common.Dtos;
-
-namespace Basket.API.Basket.StoreBasket
+﻿namespace Basket.API.Basket.StoreBasket
 {
     public class StoreBasketEndpoint : ICarterModule
     {

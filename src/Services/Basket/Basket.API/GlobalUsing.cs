@@ -1,6 +1,7 @@
 ﻿global using Carter;
 global using Marten;
 global using MediatR;
+global using FluentValidation;
 global using Basket.API.Model;
 global using Basket.API.Data;
 global using Basket.API.Common.Dtos;

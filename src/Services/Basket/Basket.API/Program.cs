@@ -1,4 +1,3 @@
-using Basket.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var assembly = typeof(Program).Assembly;
@@ -27,9 +26,10 @@ builder.Services.AddScoped<IBasketRepository,BasketRepository>();
 builder.Services.Decorate<IBasketRepository,CachedBasketRepository>();
 
 builder.Services.AddCarter();
-
+builder.Services.AddValidatorsFromAssembly(assembly);
 builder.Services.AddSwaggerGen();
 builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
