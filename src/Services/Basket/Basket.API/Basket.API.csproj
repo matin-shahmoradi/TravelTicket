@@ -4,6 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8130706c-3043-419f-b205-ee58d9e16b36</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Carter" Version="10.0.0" />
+    <PackageReference Include="Marten" Version="8.22.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
+    <PackageReference Include="Scrutor" Version="3.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Commons\BuildingBlocks\BuildingBlocks.csproj" />
+  </ItemGroup>
 
 </Project>
