@@ -1,15 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Reflection;
 
 namespace Ordering.Infrastructure.Data
 {
-    internal class OrderContext : DbContext
+    internal sealed class OrderContext : DbContext
     {
         public OrderContext(DbContextOptions<OrderContext> options) : base(options)
         {
-            
+
+        }
+
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<Ticket> Tickets => Set<Ticket>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

@@ -1,5 +1,7 @@
+using Ordering.API;
 using Ordering.Application;
 using Ordering.Infrastructure;
+using Ordering.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,15 +18,12 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseApiService();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    await app.InitialiseDatabaseAsync();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
 
 app.Run();

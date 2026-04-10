@@ -6,7 +6,6 @@ namespace Ordering.Domain.Models
     {
         internal OrderItem(OrderId orderId, TicketId ticketId, int quantity, decimal price)
         {
-            Id = OrderItemId.New();
             OrderId = orderId;
             TicketId = ticketId;
             Quantity = quantity;
