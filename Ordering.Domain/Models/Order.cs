@@ -18,14 +18,13 @@ namespace Ordering.Domain.Models
             get => OrderItems.Sum(x => x.Quantity * x.Price);
             private set { }
         }
-        public static Order Create(OrderId id , CustomerId customerId, OrderName orderName,OrderStatus orderStatus , Payment payment)
+        public static Order Create(OrderId id , CustomerId customerId, OrderName orderName, Payment payment)
         {
             var order = new Order
             {
                 Id = id,
                 CustomerId = customerId,
                 OrderName = orderName,
-                OrderStatus = OrderStatus.Pending,
                 Payment = payment
             };
 
@@ -33,7 +32,7 @@ namespace Ordering.Domain.Models
             return order;
         }
 
-        public static void Update(OrderName orderName , OrderStatus orderStatus, Payment payment)
+        public void Update(OrderName orderName , OrderStatus orderStatus, Payment payment)
         {
             var order = new Order
             {
@@ -45,10 +44,23 @@ namespace Ordering.Domain.Models
             order.AddDomainEvents(new OrderUpdatedEvent(order));
         }
 
-        //public static void Add(TicketId ticketId , int quantity , decimal price)
-        //{
-        //    var orderItem = new OrderItem(orderId:,ticketId,quantity,price);
-        //}
+        public void Add(TicketId ticketId, int quantity, decimal price)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
+            ArgumentOutOfRangeException.ThrowIfNegative(quantity);
 
+            var orderItem = new OrderItem(Id,ticketId, quantity, price);
+
+            _orderItems.Add(orderItem);
+        }
+
+        public void Remove(TicketId ticketId)
+        {
+            var orderItem = _orderItems.FirstOrDefault(x => x.TicketId == ticketId);
+            if (orderItem is not null)
+            {
+                _orderItems.Remove(orderItem);
+            }
+        }
     }
 }

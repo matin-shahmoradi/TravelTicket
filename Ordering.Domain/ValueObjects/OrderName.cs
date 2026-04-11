@@ -7,7 +7,7 @@
 
         }
 
-        public static OrderName From(string value)
+        public static OrderName New(string value)
         {
             if(string.IsNullOrEmpty(value))
                 throw new ArgumentNullException("Order name cannot be empty.",nameof(value));

@@ -22,7 +22,7 @@ namespace Ordering.Domain.ValueObjects
             PaymentMethod = paymentMethod;
         }
 
-        public static Payment From(string cardName, string cardNumber, string expiration, string cvv, int paymentMethod)
+        public static Payment New(string cardName, string cardNumber, string expiration, string cvv, int paymentMethod)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(cardName);
             ArgumentNullException.ThrowIfNullOrWhiteSpace(cardNumber);
