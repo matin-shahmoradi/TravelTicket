@@ -1,9 +1,15 @@
-﻿namespace Ordering.API
+﻿using System.Reflection;
+
+namespace Ordering.API
 {
     public static class ApiDependencyInjection
     {
         public static IServiceCollection AddApiService(this IServiceCollection services)
         {
+            services.AddMediatR(cfg => 
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            });
             return services;
         }
 
