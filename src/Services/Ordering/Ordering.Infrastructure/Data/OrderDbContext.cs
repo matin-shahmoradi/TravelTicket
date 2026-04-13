@@ -1,10 +1,11 @@
-﻿using System.Reflection;
+﻿using Ordering.Application.Data;
+using System.Reflection;
 
 namespace Ordering.Infrastructure.Data
 {
-    internal sealed class OrderContext : DbContext
+    internal sealed class OrderDbContext : DbContext , IOrderDbContext
     {
-        public OrderContext(DbContextOptions<OrderContext> options) : base(options)
+        public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options)
         {
 
         }

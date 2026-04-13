@@ -41,7 +41,7 @@ namespace Ordering.Domain.Models
                 Payment = payment
             };
 
-            order.AddDomainEvents(new OrderUpdatedEvent(order));
+            order.AddDomainEvents(new OrderUpdatedEvent(this));
         }
 
         public void Add(TicketId ticketId, int quantity, decimal price)

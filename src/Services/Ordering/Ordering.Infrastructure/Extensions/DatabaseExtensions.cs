@@ -10,7 +10,7 @@ namespace Ordering.Infrastructure.Extensions
         {
             using var scope = app.Services.CreateScope();
 
-            var context = scope.ServiceProvider.GetRequiredService<OrderContext>();
+            var context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
 
             await context.Database.MigrateAsync();
         }
