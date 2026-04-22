@@ -8,6 +8,6 @@
     [StronglyTypedId]
     public partial struct OrderId()
     {
-
+        public static OrderId New(Guid value) => new OrderId(value);
     }
 }

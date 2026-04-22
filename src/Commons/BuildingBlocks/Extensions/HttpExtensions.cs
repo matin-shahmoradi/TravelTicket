@@ -6,7 +6,7 @@ namespace BuildingBlocks.Extensions
 {
     public static class HttpExtensions
     {
-        public static IResult ToHttpResult<T>(this Result<T> result, HttpContext context)
+        public static IResult ToProblemResult<T>(this Result<T> result, HttpContext context)
         {
             var error = result.Error!.Value;
             var statusCode = MapStatusCode(error.ErrorType);

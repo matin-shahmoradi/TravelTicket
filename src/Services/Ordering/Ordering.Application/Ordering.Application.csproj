@@ -16,9 +16,4 @@
     <ProjectReference Include="..\..\..\Commons\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Orders\Events\" />
-    <Folder Include="Orders\Queries\" />
-  </ItemGroup>
-
 </Project>
