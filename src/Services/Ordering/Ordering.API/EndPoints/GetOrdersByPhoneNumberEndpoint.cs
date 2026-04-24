@@ -6,10 +6,11 @@ namespace Ordering.API.EndPoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("orders/customer/{phoneNumber:string}",
-                async (ISender sender,
-                HttpContext context,
-                [FromRoute] string phoneNumber) =>
+            app.MapGet("orders/customer/{phoneNumber}",
+                async (
+                    HttpContext context,
+                    [FromServices] ISender sender,
+                    [FromRoute] string phoneNumber) =>
             {
                 var getOrdersByPhoneNumber = new GetOrdersByPhoneNumberQuery(phoneNumber);
 
@@ -21,7 +22,7 @@ namespace Ordering.API.EndPoints
                 }
 
                 return Results.Ok(query);
-            })  
+            })
                 .WithName("GetOrdersByPhoneNumber")
                 .Produces(StatusCodes.Status200OK)
                 .ProducesProblem(StatusCodes.Status404NotFound)

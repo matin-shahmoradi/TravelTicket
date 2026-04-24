@@ -10,7 +10,7 @@
                 if (command.IsSuccess)
                     return Results.Created($"baskets/{command.Value}",command.Value);
 
-                return command.ToHttpResult(context);
+                return command.ToProblemResult(context);
             });
         }
     }

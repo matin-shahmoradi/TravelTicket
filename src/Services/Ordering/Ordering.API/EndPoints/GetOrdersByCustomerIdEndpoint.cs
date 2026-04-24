@@ -6,7 +6,10 @@ namespace Ordering.API.EndPoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("orders/customer/{id:guid}" , async (ISender sender , HttpContext context , [FromRoute] Guid id) =>
+            app.MapGet("orders/customer/{id:guid}" , async (
+                HttpContext context,
+                [FromServices] ISender sender ,
+                [FromRoute] Guid id) =>
             {
                 var getOrdersByCustomerId = new GetOrdersByCustomerIdQuery(id);
 

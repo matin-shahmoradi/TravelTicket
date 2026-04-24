@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Ordering.Infrastructure.Data;
@@ -13,11 +12,9 @@ using Ordering.Infrastructure.Data;
 namespace Ordering.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20260418215800_Customer_Navigation")]
-    partial class Customer_Navigation
+    partial class OrderDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,9 +82,6 @@ namespace Ordering.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CustomerId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -138,8 +132,6 @@ namespace Ordering.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("CustomerId1");
 
                     b.ToTable("Orders");
                 });
@@ -222,15 +214,9 @@ namespace Ordering.Infrastructure.Migrations
 
             modelBuilder.Entity("Ordering.Domain.Models.Order", b =>
                 {
-                    b.HasOne("Ordering.Domain.Models.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Ordering.Domain.Models.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId1")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

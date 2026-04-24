@@ -4,8 +4,9 @@ namespace Ordering.Domain.Models
 {
     public class OrderItem : Entity<OrderItemId>
     {
-        internal OrderItem(OrderId orderId, TicketId ticketId, int quantity, decimal price)
+        internal OrderItem(OrderItemId id,OrderId orderId, TicketId ticketId, int quantity, decimal price)
         {
+            Id = id;
             OrderId = orderId;
             TicketId = ticketId;
             Quantity = quantity;

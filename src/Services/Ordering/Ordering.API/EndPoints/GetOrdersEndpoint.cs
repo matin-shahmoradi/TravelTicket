@@ -8,12 +8,13 @@ namespace Ordering.API.EndPoints
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet("orders", async (
-                ISender sender,
-                PaginationRequest orderRequest,
-                HttpContext context
+                HttpContext context,
+                [FromServices] ISender sender,
+                [FromQuery] int pageIndex,
+                [FromQuery] int pageSize
                 ) =>
             {
-                var getOrdersQuery = new GetOrdersQuery(orderRequest);
+                var getOrdersQuery = new GetOrdersQuery(new PaginationRequest(pageIndex,pageSize));
                 var query = await sender.Send(getOrdersQuery);
 
                 if (!query.IsSuccess)

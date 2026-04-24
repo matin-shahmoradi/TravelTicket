@@ -10,7 +10,7 @@
                 if (command.IsSuccess)
                     return Results.Ok(command);
 
-                return command.ToHttpResult(context);
+                return command.ToProblemResult(context);
             });
         }
     }

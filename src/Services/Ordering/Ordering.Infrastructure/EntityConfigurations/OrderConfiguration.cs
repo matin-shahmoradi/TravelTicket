@@ -1,5 +1,6 @@
 ﻿using Ordering.Domain.Enums;
 using Ordering.Infrastructure.EFCoreConvertion.OrderConvertions;
+using Ordering.Infrastructure.EFCoreConvertions.CustomerConvertions;
 using Ordering.Infrastructure.ValueConvertions.OrderConvertions;
 
 namespace Ordering.Infrastructure.EntityConfiguration
@@ -14,6 +15,9 @@ namespace Ordering.Infrastructure.EntityConfiguration
             builder.Property(x => x.Id)
                 .HasConversion(new OrderIdConverter());
 
+            builder.Property(x => x.CustomerId)
+                .HasConversion(new CustomerIdConverter());
+
             builder.Property(x => x.OrderName)
                 .HasConversion(new OrderNameConverter())
                 .HasColumnName(nameof(Order.OrderName))
@@ -21,9 +25,10 @@ namespace Ordering.Infrastructure.EntityConfiguration
                 .IsRequired();
 
             // Relations Configuration.
-            builder.HasOne<Customer>()
+            builder.HasOne(o => o.Customer)
                 .WithMany()
-                .HasForeignKey(x => x.CustomerId);
+                .HasForeignKey(x => x.CustomerId)
+                .HasPrincipalKey(x => x.Id);
 
             builder.HasMany(o => o.OrderItems)
                 .WithOne()
@@ -38,16 +43,6 @@ namespace Ordering.Infrastructure.EntityConfiguration
 
             builder.Property(x => x.TotalPrice)
                 .IsRequired();
-
-            // Complex Property Configurations.
-            //builder.ComplexProperty(x => x.OrderName, buildName =>
-            //{
-            //    buildName
-            //        .Property(n => n.Value)
-            //        .HasColumnName(nameof(Order.OrderName))
-            //        .HasMaxLength(100)
-            //        .IsRequired();
-            //});
 
             builder.ComplexProperty(p => p.Payment, buildPayment =>
             {
@@ -73,8 +68,6 @@ namespace Ordering.Infrastructure.EntityConfiguration
                     .Property(x => x.PaymentMethod)
                     .IsRequired();
             });
-
-
         }
     }
 }

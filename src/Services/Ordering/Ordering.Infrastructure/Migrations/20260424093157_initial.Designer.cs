@@ -13,8 +13,8 @@ using Ordering.Infrastructure.Data;
 namespace Ordering.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20260410190535_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260424093157_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -217,11 +217,13 @@ namespace Ordering.Infrastructure.Migrations
 
             modelBuilder.Entity("Ordering.Domain.Models.Order", b =>
                 {
-                    b.HasOne("Ordering.Domain.Models.Customer", null)
+                    b.HasOne("Ordering.Domain.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Ordering.Domain.Models.OrderItem", b =>

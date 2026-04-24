@@ -8,7 +8,7 @@
             {
                 var getBasket = await sender.Send(new GetBasketQuery(travlerNumber));
                 if(!getBasket.IsSuccess)
-                    return getBasket.ToHttpResult(context);
+                    return getBasket.ToProblemResult(context);
 
                 return Results.Ok(getBasket);
             });

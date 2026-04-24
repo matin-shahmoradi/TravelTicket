@@ -10,7 +10,7 @@ namespace Ordering.Domain.Models
 
         public decimal Price { get; private set; } = default!;
         
-        public static Ticket Create(string origin, string destination, Int16 seatNumber, decimal price)
+        public static Ticket Create(TicketId ticketId,string origin, string destination, Int16 seatNumber, decimal price)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(origin, nameof(origin));
             ArgumentException.ThrowIfNullOrWhiteSpace(destination, nameof(destination));
@@ -19,6 +19,7 @@ namespace Ordering.Domain.Models
 
             var ticket = new Ticket
             {
+                Id = ticketId,
                 Origin = origin,
                 Destination = destination,
                 SeatNumber = seatNumber,

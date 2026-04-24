@@ -6,10 +6,11 @@ namespace Ordering.API.EndPoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("/orders/{id:guid}" , async (
-                [FromBody] OrderDto request,
-                ISender sender,
-                HttpContext context) =>
+            app.MapPut("orders/{id:guid}" , async (
+                HttpContext context,
+                [FromServices] ISender sender,
+                [FromBody] OrderDto request
+                ) =>
             {
                 var updateOrderCommand = new UpdateOrderCommand(request);
 

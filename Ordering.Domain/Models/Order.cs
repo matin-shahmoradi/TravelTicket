@@ -9,7 +9,7 @@ namespace Ordering.Domain.Models
         public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
         public CustomerId CustomerId { get; private set; } = default!;
-        public Customer Customer { get; private set; } = default!;
+        public Customer? Customer { get; private set; }
         public OrderName OrderName { get; private set; } = default!;
         public Payment Payment { get; private set; } = default!;
         public OrderStatus OrderStatus { get; private set; } = OrderStatus.Pending;
@@ -49,7 +49,7 @@ namespace Ordering.Domain.Models
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
             ArgumentOutOfRangeException.ThrowIfNegative(quantity);
 
-            var orderItem = new OrderItem(Id,ticketId, quantity, price);
+            var orderItem = new OrderItem(OrderItemId.New(Guid.NewGuid()),Id,ticketId, quantity, price);
 
             _orderItems.Add(orderItem);
         }

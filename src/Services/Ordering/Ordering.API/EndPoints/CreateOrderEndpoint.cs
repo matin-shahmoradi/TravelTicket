@@ -6,7 +6,11 @@ namespace Ordering.API.EndPoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/orders", async ([FromBody] OrderDto orderRequest ,ISender sender, HttpContext context) =>
+            app.MapPost("orders", async (
+                HttpContext context,
+                [FromServices] ISender sender ,
+                [FromBody] OrderDto orderRequest
+                ) =>
             {
                 var createOrderCommand = new CreateOrderCommand(orderRequest);
 

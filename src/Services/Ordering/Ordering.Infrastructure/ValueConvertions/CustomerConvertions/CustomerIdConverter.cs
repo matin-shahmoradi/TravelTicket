@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Ordering.Domain.ValueObjects.IdValueObjects;
+﻿using Ordering.Domain.ValueObjects.IdValueObjects;
 
 namespace Ordering.Infrastructure.EFCoreConvertions.CustomerConvertions
 {
@@ -7,8 +6,8 @@ namespace Ordering.Infrastructure.EFCoreConvertions.CustomerConvertions
     {
         public CustomerIdConverter() : 
             base(
-                customerId => customerId.Value ,
-                value => new CustomerId(value))
+                customerId => customerId.Value,
+                value => CustomerId.New(value))
         {
 
         }
