@@ -19,14 +19,6 @@
             RuleFor(x => x.CreateTicketRequest.Date)
                 .NotEmpty().WithMessage("Date cant be empty")
                 .NotNull().WithMessage("Date is required.");
-
-            RuleFor(x => x.CreateTicketRequest.TravlerName)
-                .NotEmpty().WithMessage("TravlerName is required.")
-                .NotNull().WithMessage("TravlerName is required.");
-
-            RuleFor(x => x.CreateTicketRequest.TravlerNumber)
-                .NotEmpty().WithMessage("TravlerNumber is required.")
-                .NotNull().WithMessage("TravlerNumber is required.");
         }
     }
 }
