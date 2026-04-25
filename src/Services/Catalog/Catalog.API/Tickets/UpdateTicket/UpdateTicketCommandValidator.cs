@@ -22,13 +22,6 @@ namespace Catalog.API.Tickets.UpdateTicket
                 .NotEmpty().WithMessage("Date cant be empty")
                 .NotNull().WithMessage("Date is required.");
 
-            RuleFor(x => x.UpdateTicketRequest.TravlerName)
-                .NotEmpty().WithMessage("TravlerName is required.")
-                .NotNull().WithMessage("TravlerName is required.");
-
-            RuleFor(x => x.UpdateTicketRequest.TravlerNumber)
-                .NotEmpty().WithMessage("TravlerNumber is required.")
-                .NotNull().WithMessage("TravlerNumber is required.");
         }
     }
 }

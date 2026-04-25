@@ -15,6 +15,7 @@
             })
                 .WithName("UpdateTicket")
                 .Produces<Result<Ticket>>(StatusCodes.Status204NoContent)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
                 .ProducesProblem(StatusCodes.Status404NotFound)
                 .WithSummary("this endpoint used for update tickets");     
         }

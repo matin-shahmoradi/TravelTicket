@@ -9,10 +9,7 @@
             var existTicket = await session.LoadAsync<Ticket>(command.Id, cancellationToken);
             if (existTicket is null)
             {
-               return Result<bool>.Failure(Error.CustomError(
-                   mesaage:"Ticket not found",
-                   code:404,
-                   errorType:ErrorType.NOT_FOUND));
+                return Result<bool>.Failure(Error.NotFoundError(message:"Ticket Not Found!"));
             }
 
             session.Delete(existTicket);

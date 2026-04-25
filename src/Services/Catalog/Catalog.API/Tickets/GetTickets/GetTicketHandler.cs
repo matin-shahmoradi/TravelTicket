@@ -16,12 +16,9 @@ namespace Catalog.API.Tickets.GetTickets
                 request.Request.PageSize ?? 10);
 
             if (products is null) 
-            { 
+            {
                 return Result<IEnumerable<Ticket>>.Failure(
-                    Error.CustomError(
-                        mesaage:"Ticket Not Found" ,
-                        code:400,
-                        errorType:ErrorType.NOT_FOUND)); 
+                    Error.NotFoundError(message:"Ticket Not Found!")); 
             }
             return Result<IEnumerable<Ticket>>.Success(products);
         }

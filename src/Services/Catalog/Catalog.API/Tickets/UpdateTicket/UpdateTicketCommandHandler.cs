@@ -13,18 +13,19 @@
                 return Result<Ticket>.Failure(Error.CustomError("Ticket not found!", 404, ErrorType.NOT_FOUND));
             }
 
-            ticket.Origin = command.UpdateTicketRequest.Origin;
-            ticket.Destination = command.UpdateTicketRequest.Destination;
-            ticket.Description = command.UpdateTicketRequest.Description;
-            ticket.Date = command.UpdateTicketRequest.Date;
-            ticket.Price = command.UpdateTicketRequest.Price;
-            ticket.TravlerName = command.UpdateTicketRequest.TravlerName;
-            ticket.TravlerNumber = command.UpdateTicketRequest.TravlerNumber;
+            ticket.Update(
+                origin: command.UpdateTicketRequest.Origin,
+                destination: command.UpdateTicketRequest.Destination,
+                description: command.UpdateTicketRequest.Description,
+                travelDate: command.UpdateTicketRequest.Date,
+                price: command.UpdateTicketRequest.Price
+                );
 
             session.Update(ticket);
             await session.SaveChangesAsync();
 
             return Result<Ticket>.Success(ticket);
         }
+
     }
 }
