@@ -1,19 +1,19 @@
 ﻿namespace Catalog.API.Tickets.DeleteTicket
 {
     public record DeleteTicketCommand(Guid Id) : ICommand<Result<bool>>;
-    internal sealed class DeleteTicketCommandHandler(IDocumentSession session)
+    internal sealed class DeleteTicketCommandHandler(ICatalogDbContext catalogDb)
         : ICommandHandler<DeleteTicketCommand, Result<bool>>
     {
         public async Task<Result<bool>> Handle(DeleteTicketCommand command, CancellationToken cancellationToken)
         {
-            var existTicket = await session.LoadAsync<Ticket>(command.Id, cancellationToken);
+            var existTicket = await catalogDb.Tickets.FindAsync(command.Id,cancellationToken);
             if (existTicket is null)
             {
                 return Result<bool>.Failure(Error.NotFoundError(message:"Ticket Not Found!"));
             }
 
-            session.Delete(existTicket);
-            await session.SaveChangesAsync();
+            catalogDb.Tickets.Remove(existTicket);
+            await catalogDb.SaveChangesAsync(cancellationToken);
 
             return Result<bool>.Success(true);
         }

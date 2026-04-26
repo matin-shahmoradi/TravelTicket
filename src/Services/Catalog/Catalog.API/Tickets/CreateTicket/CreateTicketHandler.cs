@@ -3,7 +3,8 @@
 namespace Catalog.API.Tickets.CreateTicket
 {
     public record CreateTicketCommand(TicketRequestDTO CreateTicketRequest) : ICommand<Result<Guid>>;
-    public sealed class CreateTicketCommandHandler(IDocumentSession session) : ICommandHandler<CreateTicketCommand, Result<Guid>>
+    public sealed class CreateTicketCommandHandler(ICatalogDbContext catalogDb)
+        : ICommandHandler<CreateTicketCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
@@ -18,8 +19,8 @@ namespace Catalog.API.Tickets.CreateTicket
                 );
 
             // Save to database.
-            session.Store(ticket);
-            await session.SaveChangesAsync(cancellationToken);
+            await catalogDb.Tickets.AddAsync(ticket);
+            await catalogDb.SaveChangesAsync(cancellationToken);
 
             // return result using Result Pattern.
             return Result<Guid>.Success(ticket.Id.Value);

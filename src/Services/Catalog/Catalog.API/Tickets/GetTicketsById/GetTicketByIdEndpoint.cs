@@ -17,9 +17,10 @@
                 return Results.Problem();
             })
                .WithName("UpdateTickets")
-               .Produces<Result<Ticket>>(200)
-               .ProducesProblem(404)
-               .ProducesProblem(500)
+               .Produces<Result<Ticket>>(StatusCodes.Status200OK)
+               .ProducesProblem(StatusCodes.Status400BadRequest)
+               .ProducesProblem(StatusCodes.Status404NotFound)
+               .ProducesProblem(StatusCodes.Status500InternalServerError)
                .WithSummary("this endpoint used for receive ticket with unique Id");
         }
     }

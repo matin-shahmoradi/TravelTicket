@@ -1,16 +1,16 @@
 ﻿namespace Catalog.API.Tickets.UpdateTicket
 {
     public record UpdateTicketCommand(Guid Id, TicketRequestDTO UpdateTicketRequest) : ICommand<Result<Ticket>>;
-    internal sealed class UpdateTicketCommandHandler(IDocumentSession session)
+    internal sealed class UpdateTicketCommandHandler(ICatalogDbContext CatalogDb)
         : ICommandHandler<UpdateTicketCommand, Result<Ticket>>
     {
         public async Task<Result<Ticket>> Handle(UpdateTicketCommand command, CancellationToken cancellationToken)
         {
-            var ticket = await session.LoadAsync<Ticket>(command.Id, cancellationToken);
+            var ticket = await CatalogDb.Tickets.FindAsync(command.Id,cancellationToken);
 
             if (ticket is null)
             {
-                return Result<Ticket>.Failure(Error.CustomError("Ticket not found!", 404, ErrorType.NOT_FOUND));
+                return Result<Ticket>.Failure(Error.NotFoundError(message: "Ticket Not Found!"));
             }
 
             ticket.Update(
@@ -21,8 +21,8 @@
                 price: command.UpdateTicketRequest.Price
                 );
 
-            session.Update(ticket);
-            await session.SaveChangesAsync();
+            CatalogDb.Tickets.Update(ticket);
+            await CatalogDb.SaveChangesAsync(cancellationToken);
 
             return Result<Ticket>.Success(ticket);
         }
