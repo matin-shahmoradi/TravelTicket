@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.DDD;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.API.Data.Interceptors
@@ -7,14 +8,16 @@ namespace Catalog.API.Data.Interceptors
     {
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
+            DispatchCatalogDomainEvents(eventData.Context).GetAwaiter().GetResult();
             return base.SavingChanges(eventData, result);
         }
-        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
         {
-            return base.SavingChangesAsync(eventData, result, cancellationToken);
+            await DispatchCatalogDomainEvents(eventData.Context);
+            return await base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
-        private async Task DispatchCatalogDomainEvents(CatalogDbContext? catalogDbContext)
+        private async Task DispatchCatalogDomainEvents(DbContext? catalogDbContext)
         {
             if(catalogDbContext == null) return;
 
