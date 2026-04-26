@@ -9,13 +9,13 @@ namespace Catalog.API.Models
         public string Origin { get; private set; } = default!;
         public string Destination { get; private set; } = default!;
         public string Description { get; private set; } = default!;
-        public DateTime TravelDate { get; private set; }  
+        public DateTime TravelDate { get; private set; }
         public decimal Price { get; private set; }
 
         public static Ticket Create(
-            TicketId id , 
-            string origin, 
-            string destination, 
+            TicketId id,
+            string origin,
+            string destination,
             string description,
             DateTime travelDate,
             decimal price)
@@ -34,21 +34,20 @@ namespace Catalog.API.Models
         }
 
         public void Update(
-            string origin ,
+            string origin,
             string destination,
             string description,
             DateTime travelDate,
             decimal price)
         {
-            var ticket = new Ticket
-            {
-                Origin = origin,
-                Destination = destination,
-                Description = description,
-                TravelDate = travelDate,
-                Price = price
-            };
-            ticket.AddDomainEvents(new TicketUpdatedEvent(ticket));
+
+            Origin = origin;
+            Destination = destination;
+            Description = description;
+            TravelDate = travelDate;
+            Price = price;
+
+            AddDomainEvents(new TicketUpdatedEvent(this));
         }
     }
 }

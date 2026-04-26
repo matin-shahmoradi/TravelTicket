@@ -1,4 +1,6 @@
-﻿namespace Catalog.API.Tickets.UpdateTicket
+﻿using Catalog.API.Domain.ValueObjects;
+
+namespace Catalog.API.Tickets.UpdateTicket
 {
     public record UpdateTicketCommand(Guid Id, TicketRequestDTO UpdateTicketRequest) : ICommand<Result<Ticket>>;
     internal sealed class UpdateTicketCommandHandler(ICatalogDbContext CatalogDb)
@@ -6,7 +8,7 @@
     {
         public async Task<Result<Ticket>> Handle(UpdateTicketCommand command, CancellationToken cancellationToken)
         {
-            var ticket = await CatalogDb.Tickets.FindAsync(command.Id,cancellationToken);
+            var ticket = await CatalogDb.Tickets.FindAsync(TicketId.New(command.Id),cancellationToken);
 
             if (ticket is null)
             {
