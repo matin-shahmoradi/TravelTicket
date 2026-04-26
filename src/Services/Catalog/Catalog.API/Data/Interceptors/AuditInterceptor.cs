@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.API.Data.Interceptors
 {
-    public class AuditInterceptor : SaveChangesInterceptor
+    internal sealed class AuditInterceptor : SaveChangesInterceptor
     {
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
