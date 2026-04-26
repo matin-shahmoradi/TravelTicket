@@ -1,6 +1,6 @@
 ﻿namespace Catalog.API.Tickets.GetTickets
 {
-    public record GetProductRequest(int PageNumber = 1 , int PageSize = 10);
+    public record GetProductRequest(int PageNumber = 0 , int PageSize = 10);
     public class GetTicketsEndpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)

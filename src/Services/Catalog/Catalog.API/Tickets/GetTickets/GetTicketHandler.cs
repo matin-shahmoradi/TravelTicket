@@ -16,6 +16,7 @@ namespace Catalog.API.Tickets.GetTickets
                 .AsNoTracking()
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
+                .OrderBy(x => x.TravelDate)
                 .ToListAsync(cancellationToken);
                 
 
