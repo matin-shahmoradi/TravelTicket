@@ -14,19 +14,23 @@ namespace Catalog.API.Data
             await context.Database.MigrateAsync();
             await InitialData(context);
         }
-
-        private static async Task InitialData(CatalogDbContext context)
+        
+        public static async Task InitialData(CatalogDbContext catalogDb)
         {
-            if (!await context.Tickets.AnyAsync())
+            if (!await catalogDb.Tickets.AnyAsync())
             {
-                var data = new List<Ticket>
-                {
+                catalogDb.Tickets.AddRange(Tickets);
+                await catalogDb.SaveChangesAsync();
+            }
+        } 
+        public static IEnumerable<Ticket> Tickets => new List<Ticket>
+        {
                     Ticket.Create(
                         id: TicketId.New(new Guid("2A35F10A-5439-4C15-B70B-8D3C2795B9A3")),
                         origin: "TEHRAN",
                         destination: "ALBORZ",
                         description : "Description",
-                        travelDate : DateTime.Now.AddDays(7),
+                        travelDate : DateTime.UtcNow.AddDays(2),
                         price: 5800000),
 
                     Ticket.Create(
@@ -34,7 +38,7 @@ namespace Catalog.API.Data
                         origin: "MASHHAD",
                         destination: "TEHRAN",
                         description: "Description",
-                        travelDate: DateTime.Now.AddDays(7),
+                        travelDate: DateTime.UtcNow.AddDays(5),
                         price: 8000000),
 
 
@@ -43,7 +47,7 @@ namespace Catalog.API.Data
                         origin: "MALAYER",
                         destination: "TABRIZ",
                         description: "Description",
-                        travelDate: DateTime.Now.AddDays(7),
+                        travelDate: DateTime.UtcNow.AddDays(7),
                         price: 10000000),
 
                     Ticket.Create(
@@ -51,7 +55,7 @@ namespace Catalog.API.Data
                         origin: "TEHRAN",
                         destination: "KISH",
                         description: "Description",
-                        travelDate: DateTime.Now.AddDays(7),
+                        travelDate: DateTime.UtcNow.AddDays(8),
                         price: 20000000),
 
                     Ticket.Create(
@@ -59,13 +63,10 @@ namespace Catalog.API.Data
                         origin: "KERMANSHAH",
                         destination: "KERMAN",
                         description: "Description",
-                        travelDate: DateTime.Now.AddDays(7),
+                        travelDate: DateTime.UtcNow.AddDays(10),
                         price: 5000000),
-                };
+        };
 
-                await context.Tickets.AddRangeAsync(data);
-            }
-
-        }
-    }
+    }   
 }
+
