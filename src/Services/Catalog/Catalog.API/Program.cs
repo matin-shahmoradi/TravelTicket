@@ -1,9 +1,10 @@
-using Catalog.API.Data;
+using Catalog.API.CatalogExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var assembly = typeof(Program).Assembly;
 
+builder.Services.AddServices(builder.Configuration);
 // MediateR configuration.
 builder.Services.AddMediatR(config =>
 {
@@ -22,16 +23,6 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 // Carter Library Configuration.
 builder.Services.AddCarter();
 
-// Marten DocumentDB Configuration.
-builder.Services.AddMarten(config =>
-{
-    config.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!); 
-}).UseLightweightSessions();
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.InitializeMartenWith<CatalogInitialData>();
-}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -43,6 +34,7 @@ builder.Services.AddProblemDetails();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
+    await app.Populate();
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();

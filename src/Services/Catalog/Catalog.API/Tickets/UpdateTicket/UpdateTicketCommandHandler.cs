@@ -1,30 +1,33 @@
-﻿namespace Catalog.API.Tickets.UpdateTicket
+﻿using Catalog.API.Domain.ValueObjects;
+
+namespace Catalog.API.Tickets.UpdateTicket
 {
     public record UpdateTicketCommand(Guid Id, TicketRequestDTO UpdateTicketRequest) : ICommand<Result<Ticket>>;
-    internal sealed class UpdateTicketCommandHandler(IDocumentSession session)
+    internal sealed class UpdateTicketCommandHandler(ICatalogDbContext CatalogDb)
         : ICommandHandler<UpdateTicketCommand, Result<Ticket>>
     {
         public async Task<Result<Ticket>> Handle(UpdateTicketCommand command, CancellationToken cancellationToken)
         {
-            var ticket = await session.LoadAsync<Ticket>(command.Id, cancellationToken);
+            var ticket = await CatalogDb.Tickets.FindAsync(TicketId.New(command.Id),cancellationToken);
 
             if (ticket is null)
             {
-                return Result<Ticket>.Failure(Error.CustomError("Ticket not found!", 404, ErrorType.NOT_FOUND));
+                return Result<Ticket>.Failure(Error.NotFoundError(message: "Ticket Not Found!"));
             }
 
-            ticket.Origin = command.UpdateTicketRequest.Origin;
-            ticket.Destination = command.UpdateTicketRequest.Destination;
-            ticket.Description = command.UpdateTicketRequest.Description;
-            ticket.Date = command.UpdateTicketRequest.Date;
-            ticket.Price = command.UpdateTicketRequest.Price;
-            ticket.TravlerName = command.UpdateTicketRequest.TravlerName;
-            ticket.TravlerNumber = command.UpdateTicketRequest.TravlerNumber;
+            ticket.Update(
+                origin: command.UpdateTicketRequest.Origin,
+                destination: command.UpdateTicketRequest.Destination,
+                description: command.UpdateTicketRequest.Description,
+                travelDate: command.UpdateTicketRequest.Date,
+                price: command.UpdateTicketRequest.Price
+                );
 
-            session.Update(ticket);
-            await session.SaveChangesAsync();
+            CatalogDb.Tickets.Update(ticket);
+            await CatalogDb.SaveChangesAsync(cancellationToken);
 
             return Result<Ticket>.Success(ticket);
         }
+
     }
 }

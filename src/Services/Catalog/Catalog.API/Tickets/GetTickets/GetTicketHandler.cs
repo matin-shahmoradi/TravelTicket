@@ -1,29 +1,31 @@
-﻿using Marten.Pagination;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.API.Tickets.GetTickets
 {
     public record GetTicketQuery(GetProductRequest Request) : IQuery<Result<IEnumerable<Ticket>>>;
 
-    internal sealed class GetTicketQueryHandler(IDocumentSession session)
+    internal sealed class GetTicketQueryHandler(ICatalogDbContext catalogDb)
         : IQueryHandler<GetTicketQuery, Result<IEnumerable<Ticket>>>
     {
         public async Task<Result<IEnumerable<Ticket>>> Handle(GetTicketQuery request, CancellationToken cancellationToken)
         {
-            var products = await session
-                .Query<Ticket>()    
-                .ToPagedListAsync(
-                request.Request.PageNumber ?? 1,
-                request.Request.PageSize ?? 10);
+            var pageNumber = request.Request.PageNumber;
+            var pageSize = request.Request.PageSize;
 
-            if (products is null) 
-            { 
+            var tickets = await catalogDb.Tickets
+                .AsNoTracking()
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .OrderBy(x => x.TravelDate)
+                .ToListAsync(cancellationToken);
+                
+
+            if (tickets is null) 
+            {
                 return Result<IEnumerable<Ticket>>.Failure(
-                    Error.CustomError(
-                        mesaage:"Ticket Not Found" ,
-                        code:400,
-                        errorType:ErrorType.NOT_FOUND)); 
+                    Error.NotFoundError(message:"Ticket Not Found!")); 
             }
-            return Result<IEnumerable<Ticket>>.Success(products);
+            return Result<IEnumerable<Ticket>>.Success(tickets);
         }
     }
 }

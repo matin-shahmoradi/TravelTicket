@@ -5,7 +5,5 @@
         string Destination,
         string Description,
         DateTime Date,
-        decimal Price,
-        string TravlerName,
-        string TravlerNumber);
+        decimal Price);
 }
