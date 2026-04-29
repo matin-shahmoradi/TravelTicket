@@ -1,10 +1,9 @@
-﻿using BuildingBlocks.DDD;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.API.Data.Interceptors
 {
-    internal sealed class DispatchEventInterceptor(Mediator mediator) : SaveChangesInterceptor
+    internal sealed class DispatchEventInterceptor(IMediator mediator) : SaveChangesInterceptor
     {
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
