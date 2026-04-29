@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.DDD;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.API.Data.Interceptors

@@ -8,3 +8,5 @@ global using BuildingBlocks.Behaviors;
 global using FluentValidation;
 global using Microsoft.AspNetCore.Mvc;
 global using Catalog.API.Data;
+global using Catalog.API.Events;
+global using BuildingBlocks.DDD;
