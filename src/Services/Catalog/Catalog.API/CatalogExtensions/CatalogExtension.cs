@@ -1,5 +1,6 @@
 ﻿using Catalog.API.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Catalog.API.CatalogExtensions
 {
@@ -8,10 +9,11 @@ namespace Catalog.API.CatalogExtensions
         public static IServiceCollection AddServices(this IServiceCollection services , IConfiguration configuration)
         {
             services.AddScoped<ICatalogDbContext, CatalogDbContext>();
+            services.AddScoped<ISaveChangesInterceptor ,AuditInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor ,DispatchEventInterceptor>();
 
             services.AddDbContext<CatalogDbContext>(cfg =>
             {
-                cfg.AddInterceptors(new AuditInterceptor());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
             return services;
