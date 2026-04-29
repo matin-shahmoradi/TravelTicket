@@ -12,8 +12,9 @@ namespace Catalog.API.CatalogExtensions
             services.AddScoped<ISaveChangesInterceptor ,AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor ,DispatchEventInterceptor>();
 
-            services.AddDbContext<CatalogDbContext>(cfg =>
+            services.AddDbContext<CatalogDbContext>((sp,cfg) =>
             {
+                cfg.AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
             return services;
