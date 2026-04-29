@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.DDD;
-using Catalog.API.Domain.ValueObjects;
-using Catalog.API.Events;
+﻿using Catalog.API.Domain.ValueObjects;
 
 namespace Catalog.API.Models
 {
