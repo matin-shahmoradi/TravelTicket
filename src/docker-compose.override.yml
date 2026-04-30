@@ -60,6 +60,17 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     
+
+  seq:
+    container_name: seq
+    environment: 
+      - ACCEPT_EULA= Y
+    restart: always
+    ports:
+      - "5341:5341"
+      - "9091:80"
+
+
   # ordering.api:
   #   environment:
   #     - ASPNETCORE_ENVIRONMENT=Development

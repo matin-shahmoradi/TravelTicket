@@ -1,4 +1,5 @@
 using Catalog.API.CatalogExtensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
 
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
 // Fluent Validation configuration.
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 

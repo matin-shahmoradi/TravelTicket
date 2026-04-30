@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
+  seq:
+    image: datalust/seq:latest
 
   # basket.api:
   #   image: basketapi
