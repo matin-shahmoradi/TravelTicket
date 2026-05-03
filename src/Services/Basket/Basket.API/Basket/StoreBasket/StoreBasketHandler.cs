@@ -1,13 +1,15 @@
-﻿namespace Basket.API.Basket.StoreBasket
+﻿using Basket.API.Common.Dtos.MapExtensions;
+using Basket.API.Data.Repository;
+
+namespace Basket.API.Basket.StoreBasket
 {
-    public record StoreBasketCommand(BasketRequest BasketDto) : ICommand<Result<ShoppingCart>>;
+    public record StoreBasketCommand(BasketRequest BasketDto) : ICommand<Result<ShoppingCartDto>>;
     internal sealed class StoreBasketCommandHandler(IBasketRepository basketRepository) : 
-        ICommandHandler<StoreBasketCommand, Result<ShoppingCart>>
+        ICommandHandler<StoreBasketCommand, Result<ShoppingCartDto>>
     {
-        public async Task<Result<ShoppingCart>> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
+        public async Task<Result<ShoppingCartDto>> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
         {
             var basket = ShoppingCart.Create(
-                Guid.NewGuid(),
                 command.BasketDto.Username);
 
             basket.AddItem(
@@ -17,7 +19,8 @@
 
             var basketStore = await basketRepository.StoreBasket(basket,cancellationToken);
 
-            return Result<ShoppingCart>.Success(basketStore);
+            var dto = basketStore.MapToShoppingCartDto();
+            return Result<ShoppingCartDto>.Success(dto);
         }
     }
 }

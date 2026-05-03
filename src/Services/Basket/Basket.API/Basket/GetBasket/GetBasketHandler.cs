@@ -1,19 +1,22 @@
-﻿namespace Basket.API.Basket.GetBasket
+﻿using Basket.API.Common.Dtos.MapExtensions;
+using Basket.API.Data.Repository;
+
+namespace Basket.API.Basket.GetBasket
 {
-    public record GetBasketQuery(string travlerNumber) : IQuery<Result<ShoppingCart>>;
+    public record GetBasketQuery(string username) : IQuery<Result<ShoppingCartDto>>;
     internal class GetBasketQueryHandler(IBasketRepository basketRepository)
-        : IQueryHandler<GetBasketQuery, Result<ShoppingCart>>
+        : IQueryHandler<GetBasketQuery, Result<ShoppingCartDto>>
     {
-        public async Task<Result<ShoppingCart>> Handle(GetBasketQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ShoppingCartDto>> Handle(GetBasketQuery request, CancellationToken cancellationToken)
         {
-            var basket = await basketRepository.GetBasket(request.travlerNumber);
+            var basket = await basketRepository.GetBasket(request.username);
             if (basket is null)
             {
-                return Result<ShoppingCart>.Failure
+                return Result<ShoppingCartDto>.Failure
                     (Error.NotFoundError(message: "Basket not found!"));
             }
-
-            return Result<ShoppingCart>.Success(basket);
+            var dto = basket.MapToShoppingCartDto();
+            return Result<ShoppingCartDto>.Success(dto);
         }
     }
 }
