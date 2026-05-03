@@ -10,16 +10,20 @@ namespace Basket.API.Model
         public IReadOnlyList<ShoppingCartItem> Items => _items.AsReadOnly();
         public decimal TotalPrice => Items.Sum(x => x.Price * x.Quantity);
 
-        public static ShoppingCart Create(Guid id, string username)
+        public static ShoppingCart Create(string username)
         {
             ArgumentNullException.ThrowIfNull(username);
 
             var cart = new ShoppingCart
             {
-                Id = ShoppingCartId.New(id),
-                Username = username,
+                Id = ShoppingCartId.New(),
+                Username = username
             };
+            if (cart.Id.Value == Guid.Empty)
+                throw new ArgumentException("shopping cart id cant be empty.");
+
             return cart;
+            
         }
 
         public void AddItem(Guid ticketId, int quantity, decimal price)

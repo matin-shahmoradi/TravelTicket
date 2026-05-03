@@ -3,7 +3,7 @@ using BuildingBlocks.DDD;
 
 namespace Basket.API.Model
 {
-    public class ShoppingCartItem : Entity<Guid>
+    public class ShoppingCartItem : Entity<ShoppingCartItemId>
     {
         public ShoppingCartId ShoppingCartId { get; private set; }
         public Guid TicketId { get; private set; }
