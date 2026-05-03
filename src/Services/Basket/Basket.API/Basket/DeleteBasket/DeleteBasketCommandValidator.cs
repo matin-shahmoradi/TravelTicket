@@ -4,8 +4,8 @@
     {
         public DeleteBasketCommandValidator()
         {
-            RuleFor(x =>x.TravlerNumber)
-                .NotEmpty().WithMessage("Number is required.");
+            RuleFor(x =>x.Username)
+                .NotEmpty().WithMessage("username cant be empty.");
         }
     }
 }
