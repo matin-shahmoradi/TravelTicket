@@ -4,9 +4,9 @@
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("baskets",async (HttpContext context,ISender sender ,string travlerNumber) =>
+            app.MapGet("baskets",async (HttpContext context,ISender sender ,string username) =>
             {
-                var getBasket = await sender.Send(new GetBasketQuery(travlerNumber));
+                var getBasket = await sender.Send(new GetBasketQuery(username));
                 if(!getBasket.IsSuccess)
                     return getBasket.ToHttpResult(context);
 

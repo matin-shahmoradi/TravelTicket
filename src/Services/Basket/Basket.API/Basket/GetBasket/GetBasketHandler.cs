@@ -1,5 +1,4 @@
 ﻿using Basket.API.Common.Dtos.MapExtensions;
-using Basket.API.Data.Repository;
 
 namespace Basket.API.Basket.GetBasket
 {
