@@ -46,6 +46,11 @@ namespace Catalog.API.Models
             Price = price;
 
             AddDomainEvents(new TicketUpdatedEvent(this));
+
+            if(Price != price)
+            {
+                AddDomainEvents(new TicketPriceChangedEvent(this));
+            }
         }
     }
 }
