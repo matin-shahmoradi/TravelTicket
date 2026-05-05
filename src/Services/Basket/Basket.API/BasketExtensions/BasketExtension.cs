@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BuildingBlocks.Messaging.Events.Extensions;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Basket.API.BasketExtensions
@@ -25,6 +26,8 @@ namespace Basket.API.BasketExtensions
                 config.Configuration = configuration.GetConnectionString("Redis");
                 config.InstanceName = "BasketRedis";
             });
+
+            services.AddMassTransitWithAssembly(assembly);
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();

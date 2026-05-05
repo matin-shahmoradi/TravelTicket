@@ -9,6 +9,7 @@ namespace Catalog.API.EventHandlers
     {
         public async Task Handle(TicketPriceChangedEvent notification, CancellationToken cancellationToken)
         {
+            logger.LogInformation("Domain Event handled : {DomainEvent}", notification.GetType().Name);
             var ticketPriceChangedIntegrationEvent = new TicketPriceChangedIntegrationEvent
             {
                 TicketId = notification.ticket.Id.Value,

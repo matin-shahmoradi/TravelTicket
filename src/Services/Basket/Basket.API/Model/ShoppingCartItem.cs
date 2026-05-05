@@ -17,5 +17,11 @@ namespace Basket.API.Model
             Quantity = quantity;
             Price = price;
         }
+
+        public void UpdatePrice(decimal newPrice)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(newPrice);
+            Price = newPrice; 
+        }
     }
 }
