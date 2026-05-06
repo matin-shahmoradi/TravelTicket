@@ -9,10 +9,6 @@ builder.Services.AddServices(builder.Configuration);
 // MediateR configuration.
 builder.Services.AddMediatR(config =>
 {
-    config.RegisterServicesFromAssemblies(
-        typeof(Program).Assembly,
-        typeof(ValidationBehavior<,>).Assembly
-    );
     config.RegisterServicesFromAssembly(assembly);
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));

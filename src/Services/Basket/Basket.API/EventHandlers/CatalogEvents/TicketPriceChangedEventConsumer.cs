@@ -6,7 +6,7 @@ namespace Basket.API.EventHandlers.CatalogEvents
 {
     public class TicketPriceChangedEventConsumer(
         ISender sender,
-        Logger<TicketPriceChangedEventConsumer> logger) 
+        ILogger<TicketPriceChangedEventConsumer> logger) 
         : IConsumer<TicketPriceChangedIntegrationEvent>
     {
         public async Task Consume(ConsumeContext<TicketPriceChangedIntegrationEvent> context)

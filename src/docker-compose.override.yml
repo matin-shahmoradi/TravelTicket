@@ -24,7 +24,7 @@ services:
     volumes:
         - basket_postgres:/var/lib/postgresql
     
-  distributedcache:
+  redis:
     container_name: RedisDistributedCache
     restart: always
     ports:

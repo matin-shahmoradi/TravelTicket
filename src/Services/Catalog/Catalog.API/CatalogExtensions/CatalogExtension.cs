@@ -1,4 +1,5 @@
-﻿using Catalog.API.Data.Interceptors;
+﻿using BuildingBlocks.Messaging.Events.Extensions;
+using Catalog.API.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Reflection;
@@ -23,6 +24,8 @@ namespace Catalog.API.CatalogExtensions
                 cfg.AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddMassTransitWithAssembly(Assembly.GetExecutingAssembly());
             return services;
         }
         public static IResult ToHttpResult<T>(this Result<T> result)

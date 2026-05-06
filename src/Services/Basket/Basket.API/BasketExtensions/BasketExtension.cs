@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Messaging.Events.Extensions;
+﻿using Basket.API.Data.Repositories;
+using BuildingBlocks.Messaging.Events.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -30,6 +31,7 @@ namespace Basket.API.BasketExtensions
             services.AddMassTransitWithAssembly(assembly);
 
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
 
             services.AddCarter();
