@@ -1,6 +1,8 @@
 ﻿using Basket.API.Data.Repositories;
+using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Messaging.Events.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Reflection;
 
 namespace Basket.API.BasketExtensions
@@ -17,9 +19,12 @@ namespace Basket.API.BasketExtensions
                 config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             });
 
-            services.AddDbContext<BacketDbContext>(cfg =>
+            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
+            services.AddDbContext<BacketDbContext>((sp,cfg) =>
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                cfg.AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
             });
 
             services.AddStackExchangeRedisCache(config =>
@@ -28,11 +33,14 @@ namespace Basket.API.BasketExtensions
                 config.InstanceName = "BasketRedis";
             });
 
+
             services.AddMassTransitWithAssembly(assembly);
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
+
+
 
             services.AddCarter();
             services.AddValidatorsFromAssembly(assembly);
