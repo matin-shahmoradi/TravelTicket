@@ -1,6 +1,6 @@
 ﻿namespace BuildingBlocks.DDD
 {
-    public abstract class Aggregate<TId> : Entity<TId>, IAggregate<TId>
+    public abstract class Aggregate<TId> : Entity<TId>, IAggregate<TId> , IAggregate
     {
         private readonly List<IDomainEvent> _domainEvents = new();
 
@@ -11,7 +11,7 @@
             _domainEvents.Add(domainEvent);
         }
 
-        public IDomainEvent[] ClearDomainEvents()
+        public IDomainEvent[] ClearDomainEvent()
         {
             IDomainEvent[] dequeuedEvents = _domainEvents.ToArray();
 

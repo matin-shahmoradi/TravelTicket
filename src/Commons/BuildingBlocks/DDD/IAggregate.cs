@@ -1,6 +1,6 @@
 ﻿namespace BuildingBlocks.DDD
 {
-    public interface IAggregate<T> : IEntity<T>
+    public interface IAggregate<TId> : IEntity<TId> , IAggregate
     {
 
     }

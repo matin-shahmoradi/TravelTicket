@@ -30,8 +30,4 @@
     <ProjectReference Include="..\..\..\Commons\BuildingBlocks\BuildingBlocks.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Basket\AddItemInBasket\" />
-  </ItemGroup>
-
 </Project>
