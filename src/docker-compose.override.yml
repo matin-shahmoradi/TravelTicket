@@ -72,6 +72,19 @@ services:
       - "9091:80"
 
 
+  messagebus :
+    image: rabbitmq:management
+    container_name: travelticket-mq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
   # ordering.api:
   #   environment:
   #     - ASPNETCORE_ENVIRONMENT=Development

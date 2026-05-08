@@ -11,6 +11,9 @@ services:
   redis:
     image: redis
 
+  messagebus:
+    image: rabbitmq:management
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
@@ -29,3 +32,4 @@ volumes:
   postgres_data:
   basket_postgres:
   ordering_postgres:
+  rabbitmq_data:

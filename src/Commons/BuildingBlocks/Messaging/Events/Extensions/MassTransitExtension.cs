@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -6,25 +7,30 @@ namespace BuildingBlocks.Messaging.Events.Extensions
 {
     public static class MassTransitExtension
     {
-        public static IServiceCollection AddMassTransitWithAssembly(this IServiceCollection services , Assembly assembly)
+        public static IServiceCollection AddMassTransitWithAssembly(
+            this IServiceCollection services ,
+            IConfiguration configuration,
+            Assembly assembly)
         {
             services.AddMassTransit(cfg =>
             {
                 cfg.SetKebabCaseEndpointNameFormatter();
 
-                cfg.SetInMemorySagaRepositoryProvider();
-
                 cfg.AddConsumers(assembly);
-
-                cfg.AddSagaStateMachines(assembly);
-
                 cfg.AddSagas(assembly);
+                cfg.AddSagaStateMachines(assembly);
 
                 cfg.AddActivities(assembly);
 
-                cfg.UsingInMemory((context, configurator) =>
+
+                cfg.UsingRabbitMq((context , configurator) =>
                 {
-                    configurator.ConfigureEndpoints(context);
+                    configurator.Host(new Uri(configuration["MessageBroker:Host"]!), host =>
+                    {
+                        host.Username(configuration["MessageBroker:UserName"]!);
+                        host.Password(configuration["MessageBroker:Password"]!);
+                    });
+                    configurator.ConfigureEndpoints(context);  
                 });
             });
             return services;
