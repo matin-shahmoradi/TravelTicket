@@ -2,7 +2,7 @@
 {
     public interface ICacheTicketRepository
     {
-        Task<TicketReadModel> ReadTicketFromCacheAsync(string ticketId , CancellationToken cancellationToken);
+        Task<string> ReadTicketFromCacheAsync(string ticketId , CancellationToken cancellationToken);
         Task StoreTicketInCacheAsync(TicketReadModel ticket, CancellationToken cancellationToken);
     }
 }
