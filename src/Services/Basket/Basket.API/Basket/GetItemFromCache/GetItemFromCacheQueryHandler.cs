@@ -1,4 +1,5 @@
 ﻿using Basket.API.Data.Repositories;
+using System.Text.Json;
 
 namespace Basket.API.Basket.GetItemFromCache
 {
@@ -13,8 +14,9 @@ namespace Basket.API.Basket.GetItemFromCache
             {
                 return Result<TicketReadModel>.Failure(Error.NotFoundError());
             }
+            var serializedTicket = JsonSerializer.Deserialize<TicketReadModel>(ticket)!;
 
-            return Result<TicketReadModel>.Success(ticket);
+            return Result<TicketReadModel>.Success(serializedTicket);
         }
     }
 }
