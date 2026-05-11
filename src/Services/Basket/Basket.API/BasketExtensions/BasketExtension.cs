@@ -23,8 +23,8 @@ namespace Basket.API.BasketExtensions
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.AddDbContext<BacketDbContext>((sp,cfg) =>
             {
+                cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-                cfg.AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
             });
 
             services.AddStackExchangeRedisCache(config =>
@@ -34,7 +34,7 @@ namespace Basket.API.BasketExtensions
             });
 
 
-            services.AddMassTransitWithAssembly(assembly);
+            services.AddMassTransitWithAssembly(configuration,assembly);
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
