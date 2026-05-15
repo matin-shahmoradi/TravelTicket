@@ -9,9 +9,12 @@ namespace Basket.API.Data.EntityConfigurations
         public void Configure(EntityTypeBuilder<ShoppingCartItem> builder)
         {
             builder.HasKey(x => x.Id);
+
             builder.Property(x => x.Id)
-                .HasConversion(new ShoppingCartItemIdConverter())
-                .ValueGeneratedOnAdd();
+                .HasConversion(new ShoppingCartItemIdConverter());
+
+            builder.Property(x => x.ShoppingCartId)
+                .HasConversion(new ShoppingCartIdConverter());
 
             builder.Property(x => x.TicketId).IsRequired();
 
