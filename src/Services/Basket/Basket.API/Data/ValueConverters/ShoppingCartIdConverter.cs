@@ -8,7 +8,7 @@ namespace Basket.API.Data.ValueConverters
         public ShoppingCartIdConverter() : base
             (
                 id => id.Value,
-                value => ShoppingCartId.New()
+                value => new ShoppingCartId(value)
             )
         {
             
