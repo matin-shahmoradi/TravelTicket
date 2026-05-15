@@ -9,6 +9,7 @@ namespace Basket.API.Data.Repository
         {
             var basket = await DbContext
                 .ShoppingCarts
+                .Include(x => x.Items)
                 .AsNoTracking()
                 .Where(x => x.Username == username)
                 .FirstOrDefaultAsync();

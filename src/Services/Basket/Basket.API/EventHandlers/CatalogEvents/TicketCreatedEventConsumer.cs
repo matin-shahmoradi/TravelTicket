@@ -13,6 +13,8 @@ namespace Basket.API.EventHandlers.CatalogEvents
     {
         public async Task Consume(ConsumeContext<TicketCreatedIntegrationEvent> context)
         {
+            logger.LogWarning("EVENT RECEIVED {TicketId}", context.Message.TicketId);
+
             var ticketReadModel = new TicketReadModel
             {
                 TicketId = context.Message.TicketId,

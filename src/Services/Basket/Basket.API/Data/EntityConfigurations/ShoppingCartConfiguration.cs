@@ -11,8 +11,7 @@ namespace Basket.API.Data.EntityConfigurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id)
-                .HasConversion(new ShoppingCartIdConverter())
-                .ValueGeneratedOnAdd();
+                .HasConversion(new ShoppingCartIdConverter());
 
             builder.Property(x => x.Username)
                 .HasMaxLength(250)
@@ -20,6 +19,9 @@ namespace Basket.API.Data.EntityConfigurations
 
             builder.HasIndex(x => x.Username)
                 .IsUnique();
+
+            builder.Navigation(x => x.Items)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
 
             builder.HasMany(i => i.Items)
                 .WithOne()
