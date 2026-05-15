@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Basket.API.Data.Repository
 {
-    public class CachedBasketRepository(IBasketRepository basketRepository , IDistributedCache cache) 
+    public class CachedBasketRepository(IBasketRepository basketRepository, IDistributedCache cache)
         : IBasketRepository
     {
         public async Task<ShoppingCart> GetBasket(string username, CancellationToken cancellation = default)
@@ -13,15 +13,19 @@ namespace Basket.API.Data.Repository
 
             if (!string.IsNullOrEmpty(getCachedBasket))
             {
-               var cachedbasket = JsonSerializer.Deserialize<ShoppingCartDto>(getCachedBasket)!;
-               return Mapper.MapToShoppingCartEntity(cachedbasket); 
+                var cachedbasket = JsonSerializer.Deserialize<ShoppingCartDto>(getCachedBasket)!;
+                return Mapper.MapToShoppingCartEntity(cachedbasket);
             }
 
             var basket = await basketRepository.GetBasket(username, cancellation);
 
-            await cache.SetStringAsync(username, JsonSerializer.Serialize(basket));
+            if (basket != null)
+            {
+                var dto = basket.MapToShoppingCartDto();
+                await cache.SetStringAsync(username, JsonSerializer.Serialize(dto));
+            }
 
-            return basket;
+            return basket!;
         }
 
         public async Task<ShoppingCart> StoreBasket(ShoppingCart basket, CancellationToken cancellation = default)
@@ -29,7 +33,7 @@ namespace Basket.API.Data.Repository
             var storeBasket = await basketRepository.StoreBasket(basket, cancellation);
 
             var dto = storeBasket.MapToShoppingCartDto();
-            await cache.SetStringAsync(basket.Username,JsonSerializer.Serialize(dto));
+            await cache.SetStringAsync(basket.Username, JsonSerializer.Serialize(dto));
 
             return storeBasket;
         }
