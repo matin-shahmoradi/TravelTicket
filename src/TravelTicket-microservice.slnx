@@ -9,6 +9,9 @@
   <Folder Name="/Services/Catalog/">
     <Project Path="Services/Catalog/Catalog.API/Catalog.API.csproj" Id="43ed1318-efd7-49cc-91cb-43caed5b587f" />
   </Folder>
+  <Folder Name="/Services/Gateway/">
+    <Project Path="Services/Gateway/WebApplication1/Yarp.Api.csproj" Id="a356e7c2-1fb5-4742-9f00-a44c5b487af6" />
+  </Folder>
   <Folder Name="/Services/Ordering/">
     <Project Path="../Ordering.Domain/Ordering.Domain.csproj" Id="8bdaad38-c328-4db7-94ec-fbd0424fbd91" />
     <Project Path="Services/Ordering/Ordering.API/Ordering.API.csproj" Id="4371486a-0eed-4afa-a633-f13ec26c06f1" />
