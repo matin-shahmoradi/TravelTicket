@@ -6,7 +6,7 @@ namespace Basket.API.Basket.AddItemToBasket
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("baskets/{username}", async (
+            app.MapPost("baskets/{username}/items", async (
                 HttpContext context,
                 ISender sender, 
                 [FromBody] AddItemToBasketDto dto) =>
