@@ -11,7 +11,8 @@ namespace Basket.API.Data.EntityConfigurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id)
-                .HasConversion(new ShoppingCartItemIdConverter());
+                .HasConversion(new ShoppingCartItemIdConverter())
+                .ValueGeneratedOnAdd();
 
             builder.Property(x => x.ShoppingCartId)
                 .HasConversion(new ShoppingCartIdConverter());
