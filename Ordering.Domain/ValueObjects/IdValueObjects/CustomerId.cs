@@ -6,7 +6,7 @@
     //}
 
     [StronglyTypedId]
-    public partial struct CustomerId()
+    public partial struct CustomerId
     {
         public static CustomerId New(Guid value) => new CustomerId(value);
     }

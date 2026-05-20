@@ -6,7 +6,7 @@
     //}
 
     [StronglyTypedId]
-    public partial struct OrderId()
+    public partial struct OrderId
     {
 
     }
