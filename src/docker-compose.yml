@@ -8,6 +8,8 @@ services:
   orderingDb:
     image: postgres
 
+  authDb:
+    image: postgres
   redis:
     image: redis
 
@@ -32,4 +34,5 @@ volumes:
   postgres_data:
   basket_postgres:
   ordering_postgres:
+  auth_postgres:
   rabbitmq_data:
