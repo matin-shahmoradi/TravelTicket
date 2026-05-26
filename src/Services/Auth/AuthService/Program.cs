@@ -1,36 +1,20 @@
+using AuthService;
 using AuthService.Data;
-using AuthService.Model;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.Services.AddDbContext<AuthDbContext>(cfg =>
-{
-    cfg.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
-{
-    cfg.Password.RequiredLength = 8;
-})
-    .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AuthServices(builder.Configuration);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    await app.SeedDb();
+    app.UseSwagger();
+    app.UseSwaggerUI();
     app.MapOpenApi();
 }
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
