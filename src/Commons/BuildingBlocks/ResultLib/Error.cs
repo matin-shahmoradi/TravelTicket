@@ -28,6 +28,14 @@
             return new Error(message, code, errorType);
         }
 
+        public static Error UnAuthorized(
+            string message = "UnAuthorized error occured!",
+            int code = 400,
+            ErrorType errorType = ErrorType.VALIDATION_ERROR)
+        {
+            return new Error(message, code, errorType);
+        }
+
         public static Error CustomError(
             string mesaage = "Something bad happened" ,
             int code = 500, 
