@@ -30,6 +30,7 @@ namespace BuildingBlocks.Extensions
             {
                 ErrorType.VALIDATION_ERROR => "Validation Error",
                 ErrorType.NOT_FOUND => "Resource Not Found",
+                ErrorType.UNAUTHORIZED_ERROR => "Unauthorized Error",
                 _ => string.Empty,
             };
         }
@@ -39,6 +40,7 @@ namespace BuildingBlocks.Extensions
             {
                 ErrorType.VALIDATION_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1",
                 ErrorType.NOT_FOUND => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5",
+                ErrorType.UNAUTHORIZED_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2",
                 _ => string.Empty,
             };
         }
@@ -48,6 +50,7 @@ namespace BuildingBlocks.Extensions
             {
                 ErrorType.VALIDATION_ERROR => StatusCodes.Status400BadRequest,
                 ErrorType.NOT_FOUND => StatusCodes.Status404NotFound,
+                ErrorType.UNAUTHORIZED_ERROR => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError,
             };
         }
