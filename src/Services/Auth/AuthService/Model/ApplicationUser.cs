@@ -6,5 +6,14 @@ namespace AuthService.Model
     {
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
+
+        public static ApplicationUser CreateUser(string email,string username,string firstname,string lastname)
+        {
+            return new ApplicationUser { 
+                Email = email,
+                UserName = username,
+                FirstName = firstname,
+                LastName = lastname };
+        }
     }
 }
