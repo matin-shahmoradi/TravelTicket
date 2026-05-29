@@ -1,6 +1,7 @@
 ﻿using AuthService.Model;
 using AuthService.Model.DTOs.LoginDtos;
 using BuildingBlocks;
+using BuildingBlocks.CQRS;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,14 +10,13 @@ using System.Text;
 
 namespace AuthService.Auth.Login
 {
-    // TODO : refactoring the Login service based on CQRS and MediateR
-    public class LoginService
+    public class LoginCommandHandler : ICommandHandler<LoginCommand, Result<LoginResponse>>
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public LoginService(
+        public LoginCommandHandler(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration)
@@ -25,17 +25,16 @@ namespace AuthService.Auth.Login
             _userManager = userManager;
             _configuration = configuration;
         }
-
-        public async Task<Result<LoginResponse>> LoginAsync(string email, string password)
+        public async Task<Result<LoginResponse>> Handle(LoginCommand command, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(command.Request.Email);
             if (user == null)
                 return Result<LoginResponse>.Failure(Error.UnAuthorized(message: "invalid username or password"));
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, command.Request.Password, false);
 
             if (!result.Succeeded)
-                Result<string>.Failure(Error.UnAuthorized(message: "invalid username or password"));
+                return Result<LoginResponse>.Failure(Error.UnAuthorized(message: "invalid username or password"));
 
             var roles = await _userManager.GetRolesAsync(user);
             var token = GenerateJwtToken(user , roles);
@@ -46,16 +45,15 @@ namespace AuthService.Auth.Login
                 token: token)
                 );
         }
-
-        private string GenerateJwtToken(ApplicationUser user , IList<string> roles)
+        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email!),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
             };
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role,role)));
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
