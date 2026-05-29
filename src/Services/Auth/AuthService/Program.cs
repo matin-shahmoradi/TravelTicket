@@ -1,5 +1,6 @@
 using AuthService;
 using AuthService.Data;
+using Carter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,5 +21,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapCarter();
 app.Run();

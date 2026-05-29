@@ -1,42 +1,46 @@
-﻿using AuthService.Auth.Login;
-using AuthService.Auth.Register;
+﻿using AuthService.Auth.Register;
 using AuthService.Data;
 using AuthService.Interfaces;
 using AuthService.Model;
 using AuthService.Repositories;
+using Carter;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 
 namespace AuthService
 {
     public static class AuthExtensions
     {
-        public static IServiceCollection AuthServices(this IServiceCollection services , IConfiguration configuration)
+        public static IServiceCollection AuthServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddControllers();
 
             services.AddOpenApi();
-
+            services.AddCarter();
             services.AddDbContext<AuthDbContext>(cfg =>
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(cfg =>
+            services.AddIdentityCore<ApplicationUser>(cfg =>
             {
                 cfg.Password.RequiredLength = 8;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AuthDbContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddSignInManager();
+
 
             // DI Configurations
-            services.AddScoped<IUserQueryService , UserQueryService>();
+            services.AddScoped<IUserQueryService, UserQueryService>();
             services.AddScoped<RegisterService>();
-            services.AddScoped<LoginService>();
 
             services.AddSwaggerGen();
 
@@ -44,8 +48,12 @@ namespace AuthService
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).
                 AddJwtBearer(opt =>
                 {
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -58,14 +66,18 @@ namespace AuthService
 
                         ValidateLifetime = true,
 
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AdminOnly",policy => policy.RequireRole(Roles.SuperAdmin));
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.SuperAdmin, Roles.Admin));
             });
             return services;
         }
     }
 }
+
