@@ -30,9 +30,16 @@ services:
   #     context: .
   #     dockerfile: Services/Basket/Basket.API/Dockerfile
 
+  authservice:
+    image: ${DOCKER_REGISTRY-}authservice
+    build:
+      context: .
+      dockerfile: Services/Auth/AuthService/Dockerfile
+
 volumes:
   postgres_data:
   basket_postgres:
   ordering_postgres:
   auth_postgres:
   rabbitmq_data:
+
