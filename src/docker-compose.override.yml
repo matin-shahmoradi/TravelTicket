@@ -96,7 +96,14 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: unless-stopped
-
+    
+  papercut:
+    image: changemakerstudiosus/papercut-smtp:latest
+    container_name: paperCut
+    ports:
+      - "8080:8080"
+      - "2525:2525"
+    restart: unless-stopped
   # ordering.api:
   #   environment:
   #     - ASPNETCORE_ENVIRONMENT=Development

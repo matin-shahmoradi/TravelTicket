@@ -24,6 +24,8 @@ services:
   seq:
     image: datalust/seq:latest
 
+  papercut:
+    image: changemakerstudiosus/papercut-smtp:latest
   # basket.api:
   #   image: basketapi
   #   build:
