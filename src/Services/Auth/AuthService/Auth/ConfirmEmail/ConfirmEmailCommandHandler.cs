@@ -7,7 +7,7 @@ using System.Text;
 
 namespace AuthService.Auth.ConfirmEmail
 {
-    public class ConfirmEmailCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<ConfirmEmailCommand, Result<string>>
+    internal sealed class ConfirmEmailCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<ConfirmEmailCommand, Result<string>>
     {
         public async Task<Result<string>> Handle(ConfirmEmailCommand command, CancellationToken cancellationToken)
         {
