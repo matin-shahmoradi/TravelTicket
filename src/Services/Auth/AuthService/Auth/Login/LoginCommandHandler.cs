@@ -1,8 +1,8 @@
-﻿using AuthService.Model;
+﻿using AuthService.Interfaces;
+using AuthService.Model;
 using AuthService.Model.DTOs.LoginDtos;
 using BuildingBlocks;
 using BuildingBlocks.CQRS;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,34 +10,27 @@ using System.Text;
 
 namespace AuthService.Auth.Login
 {
-    public class LoginCommandHandler : ICommandHandler<LoginCommand, Result<LoginResponse>>
+    internal sealed class LoginCommandHandler(
+        IUserManagerQueryService userQueryService,
+        IUserRoleQueryService userRoleQueryService,
+        IUserSignInManagerService userSignInManager,
+        IConfiguration _configuration
+        )
+        : ICommandHandler<LoginCommand, Result<LoginResponse>>
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
-
-        public LoginCommandHandler(
-            SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
-        {
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _configuration = configuration;
-        }
         public async Task<Result<LoginResponse>> Handle(LoginCommand command, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(command.Request.Email);
-            if (user == null)
+            var user = await userQueryService.GetUserByEmailAsync(command.Request.Email, cancellationToken);
+            if (user is null)
                 return Result<LoginResponse>.Failure(Error.UnAuthorized(message: "invalid username or password"));
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, command.Request.Password, false);
+            var result = await userSignInManager.ValidateUserPassword(user, command.Request.Password);
 
-            if (!result.Succeeded)
+            if (!result)
                 return Result<LoginResponse>.Failure(Error.UnAuthorized(message: "invalid username or password"));
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = GenerateJwtToken(user , roles);
+            var roles = await userRoleQueryService.GetUserRolesAsync(user.Id);
+            var token = GenerateJwtToken(user, roles);
 
             return Result<LoginResponse>.Success(new LoginResponse(
                 email: user.Email!,
@@ -45,7 +38,7 @@ namespace AuthService.Auth.Login
                 token: token)
                 );
         }
-        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
+        private string GenerateJwtToken(ApplicationUser user, IReadOnlyList<string> roles)
         {
             var claims = new List<Claim>
             {
