@@ -1,10 +1,8 @@
 ﻿namespace AuthService.Model.DTOs.RegisterDtos
 {
-    public record RegisterRequest(
+    public record RegisterRequestDto(
         string Email,
         string Password,
         string Firstname,
-        string Lastname)
-    {
-    }
+        string Lastname);
 }
