@@ -13,7 +13,8 @@ namespace AuthService.Auth.GetUsersByEmail
         public GetUserByEmailQueryValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email can't be empty.");
+                .NotEmpty().WithMessage("Email can't be empty.")
+                .EmailAddress().WithMessage("invalid email format."); 
         }
     }
 }
