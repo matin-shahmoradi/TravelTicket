@@ -1,6 +1,6 @@
-﻿using AuthService.Auth.Register;
-using AuthService.Data;
+﻿using AuthService.Data;
 using AuthService.Interfaces;
+using AuthService.MapperProfiles;
 using AuthService.Model;
 using AuthService.Repositories;
 using Carter;
@@ -21,8 +21,7 @@ namespace AuthService
         {
             services.AddControllers();
 
-            services.AddOpenApi();
-            services.AddCarter();
+
             services.AddDbContext<AuthDbContext>(cfg =>
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
@@ -37,11 +36,15 @@ namespace AuthService
                 .AddDefaultTokenProviders()
                 .AddSignInManager();
 
+            services.AddFluentEmail(
+                configuration["FluentEmail:SenderEmail"],
+                configuration["FluentEmail:Sender"])
+                .AddSmtpSender(configuration["FluentEmail:Host"], configuration.GetValue<int>("FluentEmail:Port"));
 
             // DI Configurations
-            services.AddScoped<IUserQueryService, UserQueryService>();
-            services.AddScoped<RegisterService>();
-
+            services.AddScoped<IUserManagerQueryService, UserManagerQueryService>();
+            services.AddScoped<IUserRoleQueryService, UserRoleQueryService>();
+            services.AddScoped<IUserSignInManagerService, UserSignInManagerService>();
             services.AddSwaggerGen();
 
             services.AddMediatR(cfg =>
@@ -76,6 +79,14 @@ namespace AuthService
             {
                 options.AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.SuperAdmin, Roles.Admin));
             });
+
+
+            services.AddAutoMapper(options =>
+            {
+                options.AddProfile<UserProfile>();
+            });
+            services.AddOpenApi();
+            services.AddCarter();
             return services;
         }
     }
