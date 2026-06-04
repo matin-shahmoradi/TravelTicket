@@ -9,8 +9,8 @@ namespace AuthService.Auth.GetUsersByEmail
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("auth/user/{email}" , async (
-                ISender sender ,
+            app.MapGet("auth/users/{email}", async (
+                ISender sender,
                 HttpContext httpContext,
                 [FromRoute] string email) =>
             {
