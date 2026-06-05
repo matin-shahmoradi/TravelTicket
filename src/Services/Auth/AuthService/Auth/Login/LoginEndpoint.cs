@@ -22,7 +22,13 @@ namespace AuthService.Auth.Login
                 }
 
                 return Results.Ok(result);
-            });
+            })
+                .WithName("Login")
+                .WithSummary("Login users")
+                .Produces(StatusCodes.Status200OK)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
         }
     }
 }
