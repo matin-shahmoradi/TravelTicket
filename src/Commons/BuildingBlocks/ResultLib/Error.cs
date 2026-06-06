@@ -2,7 +2,7 @@
 {
     public record struct Error
     {
-        private Error(string message , int code , ErrorType errorType)
+        private Error(string message, int code, ErrorType errorType)
         {
             Message = message;
             Code = code;
@@ -36,12 +36,20 @@
             return new Error(message, code, errorType);
         }
 
+        public static Error Forbidden(
+            string message = "Aceess denied !",
+            int code = 400,
+            ErrorType errorType = ErrorType.FORBIDDEN_ERROR)
+        {
+            return new Error(message, code, errorType);
+        }
+
         public static Error CustomError(
-            string mesaage = "Something bad happened" ,
-            int code = 500, 
+            string mesaage = "Something bad happened",
+            int code = 500,
             ErrorType errorType = ErrorType.CUSTOM_ERROR)
         {
-            return new Error(mesaage , code,errorType);
+            return new Error(mesaage, code, errorType);
         }
     }
 }

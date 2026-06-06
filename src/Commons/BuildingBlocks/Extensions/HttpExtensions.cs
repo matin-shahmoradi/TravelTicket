@@ -21,7 +21,7 @@ namespace BuildingBlocks.Extensions
             };
             problemDetails.Extensions["traceId"] =
                 Activity.Current?.Id ?? context.TraceIdentifier;
-            
+
             return Results.Problem(problemDetails);
         }
         private static string MapErrorTypeToProblemType(ErrorType errorType)
@@ -31,6 +31,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.VALIDATION_ERROR => "Validation Error",
                 ErrorType.NOT_FOUND => "Resource Not Found",
                 ErrorType.UNAUTHORIZED_ERROR => "Unauthorized Error",
+                ErrorType.FORBIDDEN_ERROR => "Forbidden Error",
                 _ => string.Empty,
             };
         }
@@ -41,6 +42,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.VALIDATION_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1",
                 ErrorType.NOT_FOUND => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5",
                 ErrorType.UNAUTHORIZED_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2",
+                ErrorType.FORBIDDEN_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.4",
                 _ => string.Empty,
             };
         }
@@ -51,9 +53,9 @@ namespace BuildingBlocks.Extensions
                 ErrorType.VALIDATION_ERROR => StatusCodes.Status400BadRequest,
                 ErrorType.NOT_FOUND => StatusCodes.Status404NotFound,
                 ErrorType.UNAUTHORIZED_ERROR => StatusCodes.Status401Unauthorized,
+                ErrorType.FORBIDDEN_ERROR => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status500InternalServerError,
             };
         }
-
     }
 }
