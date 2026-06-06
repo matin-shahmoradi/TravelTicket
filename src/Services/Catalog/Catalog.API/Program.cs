@@ -6,29 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 var assembly = typeof(Program).Assembly;
 
 builder.Services.AddServices(builder.Configuration);
-// MediateR configuration.
-builder.Services.AddMediatR(config =>
-{
-    config.RegisterServicesFromAssembly(assembly);
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-});
 
 builder.Host.UseSerilog((context, config) =>
 {
     config.ReadFrom.Configuration(context.Configuration);
 });
-// Fluent Validation configuration.
-builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-
-// Carter Library Configuration.
-builder.Services.AddCarter();
-
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddProblemDetails();
 
 // Add services to the container.
 
@@ -41,6 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 // Configure the HTTP request pipeline
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapCarter();
 app.MapGet("/", () => "Hello World!");
 
