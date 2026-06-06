@@ -15,7 +15,8 @@
                 .WithName("DeleteTickets")
                 .Produces(StatusCodes.Status204NoContent)
                 .ProducesProblem(StatusCodes.Status404NotFound)
-                .WithSummary("this endpoint used for Delete ticket");     
+                .WithSummary("this endpoint used for Delete ticket")
+                .RequireAuthorization("AdminOnly");
         }
     }
 }

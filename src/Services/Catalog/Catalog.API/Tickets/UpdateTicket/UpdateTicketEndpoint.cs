@@ -17,7 +17,8 @@
                 .Produces<Result<Ticket>>(StatusCodes.Status204NoContent)
                 .ProducesProblem(StatusCodes.Status400BadRequest)
                 .ProducesProblem(StatusCodes.Status404NotFound)
-                .WithSummary("this endpoint used for update tickets");     
+                .WithSummary("this endpoint used for update tickets")
+                .RequireAuthorization("AdminOnly");
         }
     }
 }
