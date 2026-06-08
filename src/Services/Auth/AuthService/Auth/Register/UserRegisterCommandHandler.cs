@@ -3,6 +3,7 @@ using AuthService.Model.DTOs.RegisterDtos;
 using BuildingBlocks;
 using BuildingBlocks.CQRS;
 using FluentEmail.Core;
+using FluentEmail.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
@@ -12,7 +13,8 @@ namespace AuthService.Auth.Register
     public class UserRegisterCommandHandler(
         UserManager<ApplicationUser> userManager,
         IFluentEmail fluentEmail,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<UserRegisterCommandHandler> logger)
         : ICommandHandler<UserRegisterCommand, Result<RegisterResponseDto>>
     {
         public async Task<Result<RegisterResponseDto>> Handle(UserRegisterCommand command, CancellationToken cancellationToken)
@@ -34,29 +36,43 @@ namespace AuthService.Auth.Register
             if (!createUser.Succeeded)
                 return Result<RegisterResponseDto>.Failure(Error.CustomError());
 
+
             var addUserToRole = await userManager.AddToRoleAsync(newUser, Roles.User);
+            if (!addUserToRole.Succeeded)
+                return Result<RegisterResponseDto>
+                    .Failure(Error.Internal_Server(mesaage: $" Cant assign user with id {newUser.Id} to {Roles.User} role"));
 
-            string emailVerificationToken = await userManager.GenerateEmailConfirmationTokenAsync(newUser);
+            var emailValidationResponse = await SendValidatationEmail(newUser, cancellationToken);
 
-            string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(emailVerificationToken));
-
-            string baseUrl = configuration["EmailConfirmationUrl:httpUrl"]!;
-            string callbackUrl = $"{baseUrl}?userId={newUser.Id}&token={encodedToken}";
-
-            var emailResponse = await fluentEmail
-                    .To(newUser.Email)
-                    .Subject("Email verification for TravelTicket")
-                    .Body($@"Hello {newUser.FirstName} 
-                            to verify your email address click here <a href='{callbackUrl}'>Verify Email</a>", isHtml: true)
-                    .SendAsync(cancellationToken);
-
-            if (!emailResponse.Successful)
+            if (!emailValidationResponse.Successful)
             {
-                // TODO : Log exceptions.
+                logger.LogError(
+                    "Verification email sending failed. UserId: {UserId}, Email: {Email}, Errors: {@Errors}",
+                    newUser.Id,
+                    newUser.Email,
+                    emailValidationResponse.ErrorMessages
+                    );
             }
             var userRegisterResult = new RegisterResponseDto(command.Request.Email, $"{command.Request.Firstname} {command.Request.Lastname}");
 
             return Result<RegisterResponseDto>.Success(userRegisterResult);
+        }
+
+        private async Task<SendResponse> SendValidatationEmail(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            string emailVerificationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            string encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(emailVerificationToken));
+
+            string baseUrl = configuration["EmailConfirmationUrl:httpUrl"]!;
+            string callbackUrl = $"{baseUrl}?userId={user.Id}&token={encodedToken}";
+
+            return await fluentEmail
+                    .To(user.Email)
+                    .Subject("Email verification for TravelTicket")
+                    .Body($@"Hello {user.FirstName} 
+                            to verify your email address click here <a href='{callbackUrl}'>Verify Email</a>", isHtml: true)
+                    .SendAsync(cancellationToken);
         }
     }
 }
