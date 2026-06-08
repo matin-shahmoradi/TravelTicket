@@ -43,7 +43,13 @@
         {
             return new Error(message, code, errorType);
         }
-
+        public static Error Internal_Server(
+            string mesaage = "Internal server error occured!",
+            int code = 500,
+            ErrorType errorType = ErrorType.CUSTOM_ERROR)
+        {
+            return new Error(mesaage, code, errorType);
+        }
         public static Error CustomError(
             string mesaage = "Something bad happened",
             int code = 500,

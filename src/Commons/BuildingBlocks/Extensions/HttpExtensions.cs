@@ -32,6 +32,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.NOT_FOUND => "Resource Not Found",
                 ErrorType.UNAUTHORIZED_ERROR => "Unauthorized Error",
                 ErrorType.FORBIDDEN_ERROR => "Forbidden Error",
+                ErrorType.INTERNAL_SERVER_ERROR => "Internal Server Error",
                 _ => string.Empty,
             };
         }
@@ -43,6 +44,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.NOT_FOUND => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5",
                 ErrorType.UNAUTHORIZED_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2",
                 ErrorType.FORBIDDEN_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.4",
+                ErrorType.INTERNAL_SERVER_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1",
                 _ => string.Empty,
             };
         }
@@ -54,6 +56,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.NOT_FOUND => StatusCodes.Status404NotFound,
                 ErrorType.UNAUTHORIZED_ERROR => StatusCodes.Status401Unauthorized,
                 ErrorType.FORBIDDEN_ERROR => StatusCodes.Status403Forbidden,
+                ErrorType.INTERNAL_SERVER_ERROR => StatusCodes.Status500InternalServerError,
                 _ => StatusCodes.Status500InternalServerError,
             };
         }
