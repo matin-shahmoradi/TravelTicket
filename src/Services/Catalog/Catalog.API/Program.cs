@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastracture.CorrelationId;
 using Catalog.API.CatalogExtensions;
 using Serilog;
 
@@ -23,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 // Configure the HTTP request pipeline
+app.UseCorrelationId();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();

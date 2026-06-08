@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastracture.CorrelationId;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -7,6 +8,7 @@ var jwtSetting = builder.Configuration.GetSection("JwtSetting");
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddCorrelationId();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
@@ -37,6 +39,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 app.MapReverseProxy();
+app.UseCorrelationId();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

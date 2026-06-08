@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Abstractions;
 using BuildingBlocks.EntityFramwork.Interceptors;
+using BuildingBlocks.Infrastracture.CorrelationId;
 using BuildingBlocks.Messaging.Events.Extensions;
 using Catalog.API.EventHandlers;
 using Catalog.API.Tickets.CurrentUser;
@@ -70,7 +71,7 @@ namespace Catalog.API.CatalogExtensions
             });
 
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
-
+            services.AddCorrelationId();
             services.AddCarter();
 
             services.AddEndpointsApiExplorer();
