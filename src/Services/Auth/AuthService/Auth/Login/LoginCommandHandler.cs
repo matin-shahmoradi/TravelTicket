@@ -14,7 +14,8 @@ namespace AuthService.Auth.Login
         IUserManagerQueryService userQueryService,
         IUserRoleQueryService userRoleQueryService,
         IUserSignInManagerService userSignInManager,
-        IConfiguration _configuration
+        IConfiguration _configuration,
+        ILogger<LoginCommandHandler> logger
         )
         : ICommandHandler<LoginCommand, Result<LoginResponse>>
     {
@@ -32,6 +33,7 @@ namespace AuthService.Auth.Login
             var roles = await userRoleQueryService.GetUserRolesAsync(user.Id);
             var token = GenerateJwtToken(user, roles);
 
+            logger.LogInformation("User with id: {id} logged in successfully", user.Id);
             return Result<LoginResponse>.Success(new LoginResponse(
                 email: user.Email!,
                 username: user.UserName!,
