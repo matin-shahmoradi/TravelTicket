@@ -30,8 +30,8 @@
 
         public static Error UnAuthorized(
             string message = "UnAuthorized error occured!",
-            int code = 400,
-            ErrorType errorType = ErrorType.VALIDATION_ERROR)
+            int code = 401,
+            ErrorType errorType = ErrorType.UNAUTHORIZED_ERROR)
         {
             return new Error(message, code, errorType);
         }
