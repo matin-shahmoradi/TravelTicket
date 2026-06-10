@@ -43,6 +43,13 @@
         {
             return new Error(message, code, errorType);
         }
+        public static Error Conflict(
+            string message = "Conflict error occured!",
+            int code = 409,
+            ErrorType errorType = ErrorType.CONFLICT_ERROR)
+        {
+            return new Error(message, code, errorType);
+        }
         public static Error Internal_Server(
             string mesaage = "Internal server error occured!",
             int code = 500,
