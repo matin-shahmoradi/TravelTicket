@@ -21,6 +21,9 @@
     <Project Path="Services/Ordering/Ordering.Application/Ordering.Application.csproj" Id="09a5e928-73c6-47ae-aa2f-990f4d1fc5e1" />
     <Project Path="Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" Id="134044cc-b368-41f7-8197-a1840624262e" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="../AuthSerive.UnitTests/AuthService.UnitTests.csproj" Id="3bc9cdf1-e6ee-488b-8a70-4714d51e49a0" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
