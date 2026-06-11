@@ -6,7 +6,10 @@ using BuildingBlocks.CQRS;
 
 namespace AuthService.Auth.GetUsersByEmail
 {
-    internal sealed class GetUsersByEmailQueryHandler(IUserManagerQueryService userQueryService, IMapper mapper)
+    internal sealed class GetUsersByEmailQueryHandler(
+        IUserManagerQueryService userQueryService,
+        IMapper mapper
+        )
         : IQueryHandler<GetUserByEmailQuery, Result<UserResponseDto>>
     {
         public async Task<Result<UserResponseDto>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
