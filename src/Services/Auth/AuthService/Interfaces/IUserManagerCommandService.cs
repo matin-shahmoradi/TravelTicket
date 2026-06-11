@@ -8,5 +8,6 @@ namespace AuthService.Interfaces
         Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password);
         Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role);
         Task<string> CreateEmailVerificationToken(ApplicationUser user);
+        Task<IdentityResult> ConfirmUserEmailAsync(ApplicationUser user, string emailConfirmationToken);
     }
 }

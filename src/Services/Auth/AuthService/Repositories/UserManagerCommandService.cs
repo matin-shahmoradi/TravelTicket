@@ -14,5 +14,8 @@ namespace AuthService.Repositories
 
         public async Task<string> CreateEmailVerificationToken(ApplicationUser user) =>
             await userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        public async Task<IdentityResult> ConfirmUserEmailAsync(ApplicationUser user, string emailConfirmationToken) =>
+            await userManager.ConfirmEmailAsync(user, emailConfirmationToken);
     }
 }
