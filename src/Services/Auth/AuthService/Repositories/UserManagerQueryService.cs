@@ -25,6 +25,12 @@ namespace AuthService.Repositories
                     LastName = x.LastName
                 }).ToListAsync(cancellationToken);
         }
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            return await authDbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        }
 
         public async Task<ApplicationUser?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
         {
