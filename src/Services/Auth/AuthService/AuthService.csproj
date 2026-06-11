@@ -30,5 +30,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Commons\BuildingBlocks\BuildingBlocks.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="AuthService.UnitTests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
 
 </Project>
