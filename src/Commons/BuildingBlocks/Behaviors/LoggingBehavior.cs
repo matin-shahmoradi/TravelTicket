@@ -14,7 +14,7 @@ namespace BuildingBlocks.Behaviors
         }
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("[START] Handle request={Request} - Response={Response} - RequestData={Request}",
+            _logger.LogInformation("[START] Handle request={Request} - Response={Response} - RequestData={@Request}",
                 typeof(TRequest).Name, typeof(TResponse).Name, request);
 
             var timer = new Stopwatch();
@@ -23,11 +23,11 @@ namespace BuildingBlocks.Behaviors
             var response = await next();
 
             timer.Stop();
-            var timeTaken = timer.Elapsed;
+            var timeTaken = timer.ElapsedMilliseconds;
 
-            if (timeTaken.Seconds > 3)
+            if (timeTaken > 3000)
                 _logger.LogWarning("[PERFORMANCE] The request {Request} took {TimeTaken}",
-                    typeof(TRequest).Name, timeTaken.Seconds);
+                    typeof(TRequest).Name, timeTaken);
 
             _logger.LogInformation("[END] Handled {Request} with {Response}",
                 typeof(TRequest).Name, typeof(TResponse).Name);
