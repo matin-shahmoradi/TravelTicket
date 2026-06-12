@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BuildingBlocks.Serilog;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -14,6 +15,7 @@ namespace BuildingBlocks.Extensions
             {
                 loggerConfiguration
                     .ReadFrom.Configuration(configuration)
+                    .Destructure.With<SensitiveDataDestructuringPolicy>()
                     .ReadFrom.Services(services)
                     .Enrich.FromLogContext();
             });
