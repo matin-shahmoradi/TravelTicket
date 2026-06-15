@@ -7,6 +7,7 @@
         Guid? UserId { get; }
 
         string? UserName { get; }
+        string? UserEmail { get; }
 
         IReadOnlyCollection<string> Roles { get; }
 
