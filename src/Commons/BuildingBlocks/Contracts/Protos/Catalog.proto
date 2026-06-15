@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Catalog.Grpc";
+
+package catalog;
+service CatalogGrpcService {
+	rpc GetTicketById(GetTicketByIdRequest) returns (GetTicketByIdResponse);
+}
+
+message GetTicketByIdRequest {
+	string ticket_id = 1;
+}
+message GetTicketByIdResponse {
+	string ticket_id = 1;
+	string origin = 2;
+	string destination = 3;
+	string decription = 4;
+	string travelDate = 5;
+	double price = 6;
+}
+
