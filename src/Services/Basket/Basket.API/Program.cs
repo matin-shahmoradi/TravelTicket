@@ -1,5 +1,4 @@
 using Basket.API.BasketExtensions;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var assembly = typeof(Program).Assembly;
