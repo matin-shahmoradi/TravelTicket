@@ -69,7 +69,7 @@ namespace Catalog.API.CatalogExtensions
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
-
+            services.AddGrpc();
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
             services.AddCorrelationId();
             services.AddCarter();
