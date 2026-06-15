@@ -1,15 +1,24 @@
 ﻿using Basket.API.Data.Repositories;
+using Basket.API.Grpc;
+using Basket.API.Grpc.GrpcClients;
+using Basket.API.Services;
+using BuildingBlocks.Abstractions;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Messaging.Events.Extensions;
+using Catalog.Grpc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 
 namespace Basket.API.BasketExtensions
 {
     public static class BasketExtension
     {
-        public static IServiceCollection AddServices(this IServiceCollection services , IConfiguration configuration)
+        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             var assembly = Assembly.GetExecutingAssembly();
             services.AddMediatR(config =>
@@ -18,10 +27,7 @@ namespace Basket.API.BasketExtensions
                 config.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             });
-
-            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
-            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-            services.AddDbContext<BacketDbContext>((sp,cfg) =>
+            services.AddDbContext<BacketDbContext>((sp, cfg) =>
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
@@ -33,14 +39,50 @@ namespace Basket.API.BasketExtensions
                 config.InstanceName = "BasketRedis";
             });
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+                AddJwtBearer(opt =>
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = configuration["Jwt:Issuer"],
+                        ValidateIssuer = true,
 
-            services.AddMassTransitWithAssembly(configuration,assembly);
+                        ValidateAudience = true,
+                        ValidAudience = configuration["Jwt:Audience"],
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+
+                        RoleClaimType = ClaimTypes.Role
+                    };
+                });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("User", policy =>
+                {
+                    policy.RequireRole("User");
+                });
+            });
+
+            services.AddHttpContextAccessor();
+            services.AddMassTransitWithAssembly(configuration, assembly);
+
+
+            services.AddGrpcClient<CatalogGrpcService.CatalogGrpcServiceClient>(option =>
+            {
+                option.Address = new Uri(configuration["GrpcServices:Catalog"]!);
+            });
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ICatalogGrpcClient, CatalogGrpcClient>();
+            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
-
-
 
             services.AddCarter();
             services.AddValidatorsFromAssembly(assembly);
