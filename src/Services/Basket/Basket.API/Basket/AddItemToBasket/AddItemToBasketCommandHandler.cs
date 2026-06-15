@@ -1,65 +1,97 @@
 ﻿using Basket.API.Common.Dtos.MapExtensions;
 using Basket.API.Data.Repositories;
+using Basket.API.Grpc;
+using BuildingBlocks.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 
 namespace Basket.API.Basket.AddItemToBasket
 {
-    public class AddItemToBasketCommandHandler(
+    internal sealed class AddItemToBasketCommandHandler(
         BacketDbContext basketContext,
+        IBasketRepository basketRepository,
         IDistributedCache distributedCache,
-        ICacheTicketRepository cache
+        ICacheTicketRepository cache,
+        ICurrentUser currentUser,
+        ICatalogGrpcClient grpcClient,
+        ILogger<AddItemToBasketCommandHandler> logger
         )
         : ICommandHandler<AddItemToBasketCommand, Result<ShoppingCartDto>>
     {
         public async Task<Result<ShoppingCartDto>> Handle(AddItemToBasketCommand command, CancellationToken cancellationToken)
         {
-            //var basket = await basketRepository.GetBasket(command.AddItemToBasketDto.Username ,cancellationToken);   
             var basket = await basketContext.ShoppingCarts
                 .Include(x => x.Items)
-                .FirstOrDefaultAsync(x => x.Username == command.AddItemToBasketDto.Username,cancellationToken);
+                .FirstOrDefaultAsync(x => x.Username == currentUser.UserName, cancellationToken);
 
             if (basket is null)
-                return Result<ShoppingCartDto>.Failure(Error.NotFoundError(message: "basket not found"));
+            {
+                basket = ShoppingCart.Create(currentUser.UserEmail!);
+                await basketRepository.StoreBasket(basket);
+            }
 
-
-            var cachedItem = await cache.ReadTicketFromCacheAsync(
-                command.AddItemToBasketDto.TicketId.ToString(),
-                cancellationToken);
-
-            if(cachedItem is null)
-                return Result<ShoppingCartDto>.Failure(Error.NotFoundError(message: "ticket cache missed"));
-
-            var sterilizedItem = JsonSerializer.Deserialize<TicketReadModel>(cachedItem);
-
-            if(sterilizedItem is null)
-                return Result<ShoppingCartDto>.Failure(Error.CustomError(mesaage: "failed to deserialize ticket"));
+            var ticketResult = await GetTicketWithFallbackAsync(command.AddItemToBasketDto.TicketId, cancellationToken);
+            if (!ticketResult.IsSuccess)
+            {
+                if (!ticketResult.IsSuccess)
+                    return Result<ShoppingCartDto>.Failure(ticketResult.Error!.Value);
+            }
+            var ticket = ticketResult.Value;
 
             basket.AddItem(
-                ticketId: sterilizedItem!.TicketId,
+                ticketId: ticket!.TicketId,
                 quantity: command.AddItemToBasketDto.Quantity,
-                price: sterilizedItem.Price);
+                price: ticket.Price);
 
             await basketContext.SaveChangesAsync(cancellationToken);
 
             // Invalidate cache
-            await distributedCache.RemoveAsync(command.AddItemToBasketDto.Username);
+            await distributedCache.RemoveAsync(currentUser.UserId.ToString()!);
 
             // Set new cache
             await distributedCache.SetStringAsync(
-                key:command.AddItemToBasketDto.Username,
-                value:JsonSerializer.Serialize(basket.MapToShoppingCartDto())
+                key: currentUser.UserId.ToString()!,
+                value: JsonSerializer.Serialize(basket.MapToShoppingCartDto())
                 );
             return Result<ShoppingCartDto>.Success(basket.MapToShoppingCartDto());
-            
+        }
+        private async Task<Result<TicketReadModel>> GetTicketWithFallbackAsync(Guid ticketId, CancellationToken cancellationToken)
+        {
+            await distributedCache.RemoveAsync(ticketId.ToString());
+            var cachedItem = await cache.ReadTicketFromCacheAsync(ticketId.ToString(), cancellationToken);
 
-            // TODO: Implement fallback strategy when cache miss
-            // - call Ticket API
-            // - cache result
-            // - then add to basket
+            if (cachedItem is not null)
+            {
+                var ticket = JsonSerializer.Deserialize<TicketReadModel>(cachedItem);
 
-            //return Result<ShoppingCartDto>.Failure(Error.NotFoundError());
+                if (ticket is null)
+                {
+                    logger.LogError("Failed to deserialize cached ticket. TicketId: {TicketId}", ticketId);
+                    return Result<TicketReadModel>.Failure(
+                        Error.Internal_Server("Failed to deserialize cached ticket"));
+                }
+
+                return Result<TicketReadModel>.Success(ticket);
+            }
+
+            logger.LogInformation("Cache miss for ticket {TicketId}. Calling Catalog gRPC.", ticketId);
+
+            var catalogTicket = await GetTicketFromCatalogService(ticketId);
+            if (catalogTicket is null)
+            {
+                logger.LogWarning("Ticket not found in catalog. TicketId: {TicketId}", ticketId);
+
+                return Result<TicketReadModel>.Failure(Error.NotFoundError("Ticket not found"));
+            }
+            await cache.StoreTicketInCacheAsync(catalogTicket, cancellationToken);
+            return Result<TicketReadModel>.Success(catalogTicket);
+        }
+
+        private async Task<TicketReadModel?> GetTicketFromCatalogService(Guid ticketId)
+        {
+            var ticketFromCatalog = await grpcClient.GetTicketByIdAsync(ticketId.ToString()) ?? null;
+            return ticketFromCatalog;
         }
     }
 }
