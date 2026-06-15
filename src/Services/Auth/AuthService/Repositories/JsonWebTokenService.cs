@@ -14,7 +14,7 @@ namespace AuthService.Repositories
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                new Claim(ClaimTypes.Name, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email!),
             };
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
