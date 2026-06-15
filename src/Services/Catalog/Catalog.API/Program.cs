@@ -1,5 +1,6 @@
 using BuildingBlocks.Infrastracture.CorrelationId;
 using Catalog.API.CatalogExtensions;
+using Catalog.API.Grpc;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,7 @@ app.UseCorrelationId();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();
+app.MapGrpcService<CatalogRpcService>();
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
