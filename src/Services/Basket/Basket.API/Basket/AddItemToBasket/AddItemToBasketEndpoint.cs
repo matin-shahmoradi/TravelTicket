@@ -6,9 +6,9 @@ namespace Basket.API.Basket.AddItemToBasket
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("baskets/{username}/items", async (
+            app.MapPost("baskets/items", async (
                 HttpContext context,
-                ISender sender, 
+                ISender sender,
                 [FromBody] AddItemToBasketDto dto) =>
             {
                 var command = new AddItemToBasketCommand(dto);
@@ -21,7 +21,13 @@ namespace Basket.API.Basket.AddItemToBasket
                 }
                 // TODO : Redirect user to GetBasket Endpoint.
                 return Results.Ok(addItemToBasket);
-            });
+            })
+                .WithName("AddItemToBasket")
+                .WithSummary("used for add item to user basket")
+                .Produces(StatusCodes.Status200OK)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
         }
     }
 }
