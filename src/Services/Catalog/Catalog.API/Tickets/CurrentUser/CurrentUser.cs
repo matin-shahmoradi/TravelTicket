@@ -19,6 +19,7 @@ namespace Catalog.API.Tickets.CurrentUser
         }
 
         public string? UserName => _principal!.FindFirst(ClaimTypes.Name)!.Value;
+        public string? UserEmail => _principal!.FindFirst(ClaimTypes.Email)!.Value;
         public bool IsAuthenticated => _principal?.Identity?.IsAuthenticated ?? false;
         public IReadOnlyCollection<string> Roles =>
             _principal?
