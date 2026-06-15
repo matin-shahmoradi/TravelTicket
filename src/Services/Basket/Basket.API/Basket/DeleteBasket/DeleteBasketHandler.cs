@@ -10,7 +10,7 @@ namespace Basket.API.Basket.DeleteBasket
     {
         public async Task<Result<string>> Handle(DeleteBasketCommand command, CancellationToken cancellationToken)
         {
-            var existedBasket = await basketRepository.GetBasket(currentUser.UserEmail!);
+            var existedBasket = await basketRepository.GetBasket(currentUser.UserName!);
             if (existedBasket is not null)
             {
                 await basketRepository.DeleteBasket(currentUser.UserEmail!);
