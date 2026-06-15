@@ -1,15 +1,19 @@
 ﻿using Basket.API.Common.Dtos.MapExtensions;
+using BuildingBlocks.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 
 namespace Basket.API.Data.Repository
 {
-    public class CachedBasketRepository(IBasketRepository basketRepository, IDistributedCache cache)
+    public class CachedBasketRepository(
+        IBasketRepository basketRepository,
+        IDistributedCache cache,
+        ICurrentUser currentUser)
         : IBasketRepository
     {
         public async Task<ShoppingCart> GetBasket(string username, CancellationToken cancellation = default)
         {
-            var getCachedBasket = await cache.GetStringAsync(username, cancellation);
+            var getCachedBasket = await cache.GetStringAsync(currentUser.UserId.ToString()!, cancellation);
 
             if (!string.IsNullOrEmpty(getCachedBasket))
             {
