@@ -7,6 +7,7 @@ using Catalog.API.Tickets.CurrentUser;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Claims;
@@ -78,6 +79,13 @@ namespace Catalog.API.CatalogExtensions
             services.AddSwaggerGen();
             services.AddHttpContextAccessor();
             services.AddProblemDetails();
+
+            services.AddHealthChecks()
+                .AddNpgSql(
+                    connectionString: configuration.GetConnectionString("DefaultConnection")!,
+                    name: "postgres",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "ready" });
             return services;
         }
     }
