@@ -9,6 +9,7 @@ using Catalog.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Claims;
@@ -88,6 +89,19 @@ namespace Basket.API.BasketExtensions
             services.AddValidatorsFromAssembly(assembly);
             services.AddSwaggerGen();
             services.AddProblemDetails();
+
+            services.AddHealthChecks()
+                .AddNpgSql(
+                    connectionString: configuration.GetConnectionString("DefaultConnection")!,
+                    name: "postgres",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "ready" }
+                    )
+                .AddRedis(
+                    redisConnectionString: configuration.GetConnectionString("Redis")!,
+                    name: "redis",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "ready" });
 
             return services;
         }
