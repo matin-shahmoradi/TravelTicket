@@ -33,6 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtSetting["Key"]!))
         };
     });
+builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -43,6 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSerilogRequestLogging();
     app.MapOpenApi();
 }
+app.UseHealthChecks("/health");
 app.MapReverseProxy();
 app.UseCorrelationId();
 app.UseHttpsRedirection();
