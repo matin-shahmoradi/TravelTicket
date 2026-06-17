@@ -2,6 +2,8 @@ using AuthService;
 using AuthService.Data;
 using BuildingBlocks.Extensions;
 using Carter;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.MapOpenApi();
 }
+app.UseHealthChecks("/health-auth", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

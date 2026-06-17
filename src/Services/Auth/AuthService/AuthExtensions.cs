@@ -11,6 +11,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Claims;
@@ -103,6 +104,13 @@ namespace AuthService
             });
             services.AddOpenApi();
             services.AddCarter();
+
+            services.AddHealthChecks()
+                .AddNpgSql(
+                    connectionString: configuration.GetConnectionString("DefaultConnection")!,
+                    name: "postgres",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "ready" });
             return services;
         }
     }
