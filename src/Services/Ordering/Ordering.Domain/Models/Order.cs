@@ -11,34 +11,30 @@ namespace Ordering.Domain.Models
         public CustomerId CustomerId { get; private set; } = default!;
 
         public OrderName OrderName { get; private set; } = default!;
-        public Payment Payment { get; private set; } = default!;
         public OrderStatus OrderStatus { get; private set; } = OrderStatus.Pending;
         public decimal TotalPrice
         {
             get => OrderItems.Sum(x => x.Quantity * x.Price);
             private set { }
         }
-        public static Order Create(OrderId id , CustomerId customerId, OrderName orderName, Payment payment)
+        public static Order Create(OrderId id, CustomerId customerId)
         {
             var order = new Order
             {
                 Id = id,
                 CustomerId = customerId,
-                OrderName = orderName,
-                Payment = payment
             };
 
             order.AddDomainEvents(new OrderCreatedEvent(order));
             return order;
         }
 
-        public void Update(OrderName orderName , OrderStatus orderStatus, Payment payment)
+        public void Update(OrderName orderName, OrderStatus orderStatus, Payment payment)
         {
             var order = new Order
             {
                 OrderName = orderName,
-                OrderStatus = orderStatus,
-                Payment = payment
+                OrderStatus = orderStatus
             };
 
             order.AddDomainEvents(new OrderUpdatedEvent(this));
@@ -49,7 +45,7 @@ namespace Ordering.Domain.Models
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
             ArgumentOutOfRangeException.ThrowIfNegative(quantity);
 
-            var orderItem = new OrderItem(Id,ticketId, quantity, price);
+            var orderItem = new OrderItem(Id, ticketId, quantity, price);
 
             _orderItems.Add(orderItem);
         }
