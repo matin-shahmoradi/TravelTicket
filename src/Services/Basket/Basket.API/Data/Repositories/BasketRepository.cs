@@ -5,16 +5,17 @@ namespace Basket.API.Data.Repository
     public class BasketRepository(BacketDbContext DbContext)
         : IBasketRepository
     {
-        public async Task<ShoppingCart> GetBasket(string username, CancellationToken cancellation)
+        public async Task<ShoppingCart?> GetBasket(Guid customerId, QueryTrackingBehavior tracking, CancellationToken cancellation)
         {
-            var basket = await DbContext
+            IQueryable<ShoppingCart> query = DbContext
                 .ShoppingCarts
                 .Include(x => x.Items)
-                .AsNoTracking()
-                .Where(x => x.Username == username)
-                .FirstOrDefaultAsync();
+                .Where(x => x.CustomerId == customerId);
 
-            return basket!;
+            query = tracking == QueryTrackingBehavior.NoTracking
+                ? query.AsNoTracking()
+                : query.AsTracking();
+            return await query.FirstOrDefaultAsync(cancellation);
         }
         public async Task<ShoppingCart> StoreBasket(ShoppingCart basket, CancellationToken cancellation)
         {
@@ -22,11 +23,10 @@ namespace Basket.API.Data.Repository
             await DbContext.SaveChangesAsync(cancellation);
             return basket;
         }
-        public async Task<bool> DeleteBasket(string username, CancellationToken cancellation)
+        public async Task<bool> DeleteBasket(Guid customerId, CancellationToken cancellation)
         {
-            var getBasket = GetBasket(username , cancellation);
-
-            DbContext.ShoppingCarts.Remove(getBasket.Result);
+            var cart = await DbContext.ShoppingCarts.FirstOrDefaultAsync(x => x.CustomerId == customerId);
+            DbContext.ShoppingCarts.Remove(cart);
             await DbContext.SaveChangesAsync(cancellation);
             return true;
         }
