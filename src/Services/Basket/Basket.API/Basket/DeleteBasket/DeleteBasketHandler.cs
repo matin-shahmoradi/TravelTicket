@@ -10,10 +10,10 @@ namespace Basket.API.Basket.DeleteBasket
     {
         public async Task<Result<string>> Handle(DeleteBasketCommand command, CancellationToken cancellationToken)
         {
-            var existedBasket = await basketRepository.GetBasket(currentUser.UserName!);
+            var existedBasket = await basketRepository.GetBasket(currentUser.UserId);
             if (existedBasket is not null)
             {
-                await basketRepository.DeleteBasket(currentUser.UserEmail!);
+                await basketRepository.DeleteBasket(currentUser.UserId);
                 return Result<string>.Success($"Basket with Id: {existedBasket.Id} deleted successfully.");
             }
 

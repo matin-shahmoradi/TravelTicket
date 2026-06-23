@@ -1,5 +1,6 @@
 ﻿using Basket.API.Common.Dtos.MapExtensions;
 using Basket.API.Data.Repositories;
+using BuildingBlocks.Abstractions;
 using System.Text.Json;
 
 namespace Basket.API.Basket.StoreBasket
@@ -7,18 +8,20 @@ namespace Basket.API.Basket.StoreBasket
     public record StoreBasketCommand(BasketRequest BasketDto) : ICommand<Result<ShoppingCartDto>>;
     internal sealed class StoreBasketCommandHandler(
         IBasketRepository basketRepository,
-        ICacheTicketRepository ticketRepository) :
+        ICacheTicketRepository ticketRepository,
+        ICurrentUser currentUser) :
+
         ICommandHandler<StoreBasketCommand, Result<ShoppingCartDto>>
     {
         public async Task<Result<ShoppingCartDto>> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
         {
             var basket = await basketRepository.GetBasket(
-                command.BasketDto.Username,
-                cancellationToken);
+               customerId: currentUser.UserId!,
+               cancellation: cancellationToken);
 
-            if(basket is null)
+            if (basket is null)
             {
-                basket = ShoppingCart.Create(command.BasketDto.Username);
+                basket = ShoppingCart.Create(currentUser.UserId!);
             }
 
             var getTicketFromCache = await ticketRepository.ReadTicketFromCacheAsync(
