@@ -1,6 +1,7 @@
 ﻿using Basket.API.basket.BasketCheckout;
 using Basket.API.Data.Repositories;
 using BuildingBlocks.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Basket.API.basket.Checkout
 {
@@ -12,7 +13,8 @@ namespace Basket.API.basket.Checkout
     {
         public async Task<Result<bool>> Handle(BasketCheckOutCommand request, CancellationToken cancellationToken)
         {
-            var getUserBasket = await basketRepository.GetBasket(currentUser.UserId);
+            var getUserBasket = await basketRepository
+                .GetBasket(currentUser.UserId, QueryTrackingBehavior.TrackAll, cancellationToken);
 
             if (getUserBasket is null)
                 return Result<bool>.Failure(Error.NotFoundError("basket Not Found!"));
