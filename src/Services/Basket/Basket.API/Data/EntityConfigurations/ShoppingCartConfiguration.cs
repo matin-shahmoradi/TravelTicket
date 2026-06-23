@@ -13,11 +13,11 @@ namespace Basket.API.Data.EntityConfigurations
             builder.Property(x => x.Id)
                 .HasConversion(new ShoppingCartIdConverter());
 
-            builder.Property(x => x.Username)
+            builder.Property(x => x.CustomerId)
                 .HasMaxLength(250)
                 .IsRequired();
 
-            builder.HasIndex(x => x.Username)
+            builder.HasIndex(x => x.CustomerId)
                 .IsUnique();
 
             builder.Navigation(x => x.Items)
