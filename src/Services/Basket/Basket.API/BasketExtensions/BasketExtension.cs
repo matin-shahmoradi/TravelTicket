@@ -4,6 +4,7 @@ using Basket.API.Grpc.GrpcClients;
 using Basket.API.Services;
 using BuildingBlocks.Abstractions;
 using BuildingBlocks.EntityFramwork.Interceptors;
+using BuildingBlocks.Infrastracture.CorrelationId;
 using BuildingBlocks.Messaging.Events.Extensions;
 using Catalog.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,7 +20,7 @@ namespace Basket.API.BasketExtensions
 {
     public static class BasketExtension
     {
-        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
         {
             var assembly = Assembly.GetExecutingAssembly();
             services.AddMediatR(config =>
@@ -32,6 +33,10 @@ namespace Basket.API.BasketExtensions
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                if (environment.IsDevelopment())
+                {
+                    cfg.EnableSensitiveDataLogging();
+                }
             });
 
             services.AddStackExchangeRedisCache(config =>
@@ -83,13 +88,14 @@ namespace Basket.API.BasketExtensions
             services.AddScoped<ICatalogGrpcClient, CatalogGrpcClient>();
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
+            services.AddScoped<IUnitOfWork, UnitOfWorkRepository>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
 
             services.AddCarter();
             services.AddValidatorsFromAssembly(assembly);
             services.AddSwaggerGen();
             services.AddProblemDetails();
-
+            services.AddCorrelationId();
             services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString: configuration.GetConnectionString("DefaultConnection")!,
