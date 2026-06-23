@@ -23,11 +23,11 @@ namespace Basket.API.Basket.AddItemToBasket
         {
             var basket = await basketContext.ShoppingCarts
                 .Include(x => x.Items)
-                .FirstOrDefaultAsync(x => x.Username == currentUser.UserName, cancellationToken);
+                .FirstOrDefaultAsync(x => x.CustomerId == currentUser.UserId, cancellationToken);
 
             if (basket is null)
             {
-                basket = ShoppingCart.Create(currentUser.UserEmail!);
+                basket = ShoppingCart.Create(currentUser.UserId!);
                 await basketRepository.StoreBasket(basket);
             }
 
@@ -58,7 +58,6 @@ namespace Basket.API.Basket.AddItemToBasket
         }
         private async Task<Result<TicketReadModel>> GetTicketWithFallbackAsync(Guid ticketId, CancellationToken cancellationToken)
         {
-            await distributedCache.RemoveAsync(ticketId.ToString());
             var cachedItem = await cache.ReadTicketFromCacheAsync(ticketId.ToString(), cancellationToken);
 
             if (cachedItem is not null)
