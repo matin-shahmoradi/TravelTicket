@@ -7,7 +7,7 @@
             return new ShoppingCartDto
             {
                 Id = shoppingCart.Id.Value,
-                Username = shoppingCart.Username,
+                CustomerId = shoppingCart.CustomerId,
                 Items = shoppingCart.Items.Select(i => new ShoppingCartItemDto
                 {
                     TicketId = i.TicketId,
@@ -20,7 +20,7 @@
 
         public static ShoppingCart MapToShoppingCartEntity(this ShoppingCartDto dto)
         {
-            var cart = ShoppingCart.Create(dto.Username);
+            var cart = ShoppingCart.Create(dto.CustomerId);
             foreach (var item in dto.Items)
             {
                 cart.AddItem(item.TicketId, item.Quantity, item.Price);
