@@ -1,4 +1,5 @@
 using Basket.API.BasketExtensions;
+using BuildingBlocks.Infrastracture.CorrelationId;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -7,7 +8,7 @@ var assembly = typeof(Program).Assembly;
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddServices(builder.Configuration, builder.Environment);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,10 +22,10 @@ app.UseHealthChecks("/health-basket", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+app.UseCorrelationId();
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapCarter();
 app.MapGet("/", () => "Basket.API");
 
