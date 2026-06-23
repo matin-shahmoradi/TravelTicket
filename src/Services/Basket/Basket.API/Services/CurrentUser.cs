@@ -9,7 +9,7 @@ namespace Basket.API.Services
         private ClaimsPrincipal? _principal =>
             httpContextAccessor.HttpContext?.User;
 
-        public Guid? UserId
+        public Guid UserId
         {
             get
             {
