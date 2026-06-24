@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Ordering.Infrastructure.Data
 {
-    internal sealed class OrderDbContext : DbContext , IOrderDbContext
+    internal sealed class OrderDbContext : DbContext, IOrderDbContext
     {
         public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options)
         {
@@ -13,7 +13,6 @@ namespace Ordering.Infrastructure.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<Customer> Customers => Set<Customer>();
-        public DbSet<Ticket> Tickets => Set<Ticket>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
