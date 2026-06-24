@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.Events;
+﻿using BuildingBlocks.DDD;
+using Ordering.Domain.Events;
 using Ordering.Domain.ValueObjects.IdValueObjects;
 
 namespace Ordering.Domain.Models
@@ -8,9 +9,7 @@ namespace Ordering.Domain.Models
         private readonly List<OrderItem> _orderItems = new();
         public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
-        public CustomerId CustomerId { get; private set; } = default!;
-
-        public OrderName OrderName { get; private set; } = default!;
+        public CustomerId CustomerId { get; private set; } = default;
         public OrderStatus OrderStatus { get; private set; } = OrderStatus.Pending;
         public decimal TotalPrice
         {
@@ -29,11 +28,10 @@ namespace Ordering.Domain.Models
             return order;
         }
 
-        public void Update(OrderName orderName, OrderStatus orderStatus, Payment payment)
+        public void Update(OrderStatus orderStatus)
         {
             var order = new Order
             {
-                OrderName = orderName,
                 OrderStatus = orderStatus
             };
 
