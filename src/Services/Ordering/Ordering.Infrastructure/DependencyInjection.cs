@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using BuildingBlocks.Behaviors;
+using BuildingBlocks.EntityFramwork.Interceptors;
+using BuildingBlocks.Messaging.Events;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ordering.Application.Data;
 using Ordering.Infrastructure.Data;
-using Ordering.Infrastructure.Interceptors;
+using System.Reflection;
 
 namespace Ordering.Infrastructure
 {
@@ -12,10 +15,16 @@ namespace Ordering.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IOrderDbContext, OrderDbContext>();
-            services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-
-            services.AddDbContext<OrderDbContext>((sp,opt) =>
+            //services.AddMassTransitWithAssembly(configuration, typeof(BasketCheckOutEventConsumer));
+            services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            });
+            services.AddDbContext<OrderDbContext>((sp, opt) =>
             {
                 opt.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             })
