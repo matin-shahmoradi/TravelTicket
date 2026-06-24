@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.ValueObjects.IdValueObjects;
+﻿using BuildingBlocks.DDD;
+using Ordering.Domain.ValueObjects.IdValueObjects;
 
 namespace Ordering.Domain.Models
 {
