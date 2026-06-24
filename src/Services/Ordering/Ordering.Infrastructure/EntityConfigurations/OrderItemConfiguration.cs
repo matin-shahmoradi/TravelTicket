@@ -1,4 +1,5 @@
 ﻿using Ordering.Infrastructure.ValueConvertions.OrderItemConvertions;
+using Ordering.Infrastructure.ValueConvertions.TicketConvertions;
 
 namespace Ordering.Infrastructure.EntityConfiguration
 {
@@ -8,13 +9,10 @@ namespace Ordering.Infrastructure.EntityConfiguration
         {
             builder.HasKey(x => x.Id);
 
-
             builder.Property(x => x.Id)
                 .HasConversion(new OrderItemIdConverter());
-
-            builder.HasOne<Ticket>()
-                .WithMany()
-                .HasForeignKey(x => x.TicketId);
+            builder.Property(x => x.TicketId)
+                .HasConversion(new TicketIdConverter());
 
             builder.Property(q => q.Quantity).IsRequired();
             builder.Property(p => p.Price).IsRequired();
