@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.Models;
+﻿using BuildingBlocks.DDD;
+using Ordering.Domain.Models;
 
 namespace Ordering.Domain.Events
 {
