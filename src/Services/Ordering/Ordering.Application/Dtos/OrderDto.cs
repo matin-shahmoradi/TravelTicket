@@ -3,11 +3,9 @@
 namespace Ordering.Application.Dtos
 {
     public record OrderDto(
-        Guid Id , 
-        Guid CustomerId , 
-        string OrderName , 
-        PaymentDto Payment,
-        OrderStatus OrderStatus ,
+        Guid Id,
+        CustomerDto Customer,
+        OrderStatus OrderStatus,
         List<OrderItemDto> OrderItems)
     {
 
