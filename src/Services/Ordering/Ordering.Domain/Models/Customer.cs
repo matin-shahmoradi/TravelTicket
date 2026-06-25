@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.ValueObjects.IdValueObjects;
+﻿using BuildingBlocks.DDD;
+using Ordering.Domain.ValueObjects.IdValueObjects;
 
 namespace Ordering.Domain.Models
 {
@@ -13,7 +14,7 @@ namespace Ordering.Domain.Models
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(name);
             ArgumentNullException.ThrowIfNullOrWhiteSpace(nationalCode);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(phoneNumber); 
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(phoneNumber);
             ArgumentNullException.ThrowIfNullOrWhiteSpace(email);
 
             var customer = new Customer
