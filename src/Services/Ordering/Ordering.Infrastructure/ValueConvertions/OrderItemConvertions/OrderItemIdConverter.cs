@@ -7,7 +7,7 @@ namespace Ordering.Infrastructure.ValueConvertions.OrderItemConvertions
         public OrderItemIdConverter() :
             base(
                 id => id.Value,
-                value => new OrderItemId(value))
+                value => OrderItemId.New())
         { }
     }
 }
