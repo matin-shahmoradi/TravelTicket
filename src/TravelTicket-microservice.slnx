@@ -2,7 +2,9 @@
   <Folder Name="/Commons/">
     <Project Path="Commons/BuildingBlocks/BuildingBlocks.csproj" Id="2189be56-f8ba-474f-b71f-98210eb71849" />
   </Folder>
-  <Folder Name="/Services/" />
+  <Folder Name="/Services/">
+    <File Path="TODO.cs" />
+  </Folder>
   <Folder Name="/Services/Auth/">
     <Project Path="Services/Auth/AuthService/AuthService.csproj" Id="e9dcf0c2-a7ce-4e68-ad8f-52b70bb9603f" />
   </Folder>
@@ -16,9 +18,9 @@
     <Project Path="Services/Gateway/WebApplication1/Yarp.Api.csproj" Id="a356e7c2-1fb5-4742-9f00-a44c5b487af6" />
   </Folder>
   <Folder Name="/Services/Ordering/">
-    <Project Path="../Ordering.Domain/Ordering.Domain.csproj" Id="8bdaad38-c328-4db7-94ec-fbd0424fbd91" />
     <Project Path="Services/Ordering/Ordering.API/Ordering.API.csproj" Id="4371486a-0eed-4afa-a633-f13ec26c06f1" />
     <Project Path="Services/Ordering/Ordering.Application/Ordering.Application.csproj" Id="09a5e928-73c6-47ae-aa2f-990f4d1fc5e1" />
+    <Project Path="Services/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
     <Project Path="Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" Id="134044cc-b368-41f7-8197-a1840624262e" />
   </Folder>
   <Folder Name="/Tests/">
