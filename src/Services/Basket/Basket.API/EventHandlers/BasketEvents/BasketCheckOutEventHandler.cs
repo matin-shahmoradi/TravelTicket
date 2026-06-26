@@ -17,9 +17,9 @@ namespace Basket.API.EventHandlers.BasketEvents
             //TODO : add customer phone number in auth service
             var BasketCheckoutedIntegrationEvent = new BasketCheckOutIntegrationEvent
             {
-                CustomerId = currentUser.UserId!,
-                Email = currentUser.UserEmail!,
-                PhoneNumber = null!,
+                CustomerId = currentUser.UserId,
+                Email = currentUser.UserEmail,
+                PhoneNumber = currentUser.PhoneNumber,
                 Items = notification.Items.Select(x => new BasketCheckOutIntegrationEventItem
                 (
                     TicketId: x.TicketId,
