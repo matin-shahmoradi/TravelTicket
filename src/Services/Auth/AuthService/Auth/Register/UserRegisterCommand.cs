@@ -20,6 +20,10 @@ namespace AuthService.Auth.Register
 
             RuleFor(c => c.Request.Lastname)
                 .NotEmpty().WithMessage("Lastname field can't be empty.");
+            RuleFor(c => c.Request.PhoneNumber)
+                .NotEmpty().WithMessage("Phone number field can't be empty")
+                .MaximumLength(11).WithMessage("Invalid phone number format")
+                .MinimumLength(11).WithMessage("Invalid phone number format");
 
             RuleFor(c => c.Request.Password)
                 .NotEmpty().WithMessage("Password field can't be empty.")

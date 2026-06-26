@@ -25,7 +25,9 @@ namespace AuthService.Auth.Register
                 email: command.Request.Email,
                 username: command.Request.Email,
                 firstname: command.Request.Firstname,
-                lastname: command.Request.Lastname);
+                lastname: command.Request.Lastname,
+                phoneNumber: command.Request.PhoneNumber);
+
 
             var createUser = await userManagerCommandService.CreateUserAsync(newUser, command.Request.Password);
 
