@@ -17,7 +17,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ImValidEmail@gmail.com",
                 Password: "Validpassword12!",
                 Firstname: "ValidFirstName",
-                Lastname: "ValidLastName"
+                Lastname: "ValidLastName",
+                PhoneNumber: "09878578951"
             );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -42,7 +43,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: email,
                 Password: "Validpassword12!",
                 Firstname: "ValidFirstName",
-                Lastname: "ValidLastName"
+                Lastname: "ValidLastName",
+                PhoneNumber: "09878578951"
             );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -71,7 +73,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: password,
                 Firstname: "ValidFirstName",
-                Lastname: "ValidLastName"
+                Lastname: "ValidLastName",
+                PhoneNumber: "09878578951"
             );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -92,7 +95,8 @@ namespace AuthService.UnitTests.Features.Register
                Email: "ValidEmail@gmail.com",
                Password: "Validpassword12!",
                Firstname: " ",
-               Lastname: "ValidLastName"
+               Lastname: "ValidLastName",
+               PhoneNumber: "09878578951"
            );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -113,7 +117,52 @@ namespace AuthService.UnitTests.Features.Register
                Email: "ValidEmail@gmail.com",
                Password: "Validpassword12!",
                Firstname: "ValidFirstName",
-               Lastname: " "
+               Lastname: " ",
+               PhoneNumber: "09878578951"
+           );
+
+            var command = new UserRegisterCommand(registerRequestDto);
+
+            // Act
+            var result = _validator.Validate(command);
+
+            // Assert
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().NotBeNullOrEmpty();
+        }
+        [Fact]
+        public void Validate_ShouldFail_WhenPhoneNumberIsEmpty()
+        {
+            var registerRequestDto = new RegisterRequestDto
+           (
+               Email: "ValidEmail@gmail.com",
+               Password: "Validpassword12!",
+               Firstname: "ValidFirstName",
+               Lastname: "ValidLastName",
+               PhoneNumber: " "
+           );
+
+            var command = new UserRegisterCommand(registerRequestDto);
+
+            // Act
+            var result = _validator.Validate(command);
+
+            // Assert
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().NotBeNullOrEmpty();
+        }
+        [Theory]
+        [InlineData("09878")]
+        [InlineData("098785896412")]
+        public void Validate_ShouldFail_WhenPhoneNumberLengthIsNotValid(string phoneNumber)
+        {
+            var registerRequestDto = new RegisterRequestDto
+           (
+               Email: "ValidEmail@gmail.com",
+               Password: "Validpassword12!",
+               Firstname: "ValidFirstName",
+               Lastname: "ValidLastName",
+               PhoneNumber: phoneNumber
            );
 
             var command = new UserRegisterCommand(registerRequestDto);

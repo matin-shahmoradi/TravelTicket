@@ -41,7 +41,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: "ValidPassword1234@",
                 Firstname: "FirstName",
-                Lastname: "Lastname"
+                Lastname: "Lastname",
+                PhoneNumber: "09878578951"
                 );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -107,7 +108,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: "ValidPassword1234@",
                 Firstname: "FirstName",
-                Lastname: "Lastname"
+                Lastname: "Lastname",
+                PhoneNumber: "09878578951"
                 );
 
             var existedUser = new ApplicationUser
@@ -168,7 +170,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: "ValidPassword1234@",
                 Firstname: "FirstName",
-                Lastname: "Lastname"
+                Lastname: "Lastname",
+                PhoneNumber: "09878578951"
                 );
 
             var command = new UserRegisterCommand(registerRequestDto);
@@ -224,7 +227,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: "ValidPassword1234@",
                 Firstname: "FirstName",
-                Lastname: "Lastname"
+                Lastname: "Lastname",
+                PhoneNumber: "09878578951"
                 );
 
             string role = Roles.User;
@@ -286,7 +290,8 @@ namespace AuthService.UnitTests.Features.Register
                 Email: "ValidEmail@gmail.com",
                 Password: "ValidPassword1234@",
                 Firstname: "FirstName",
-                Lastname: "Lastname"
+                Lastname: "Lastname",
+                PhoneNumber: "09878578951"
                 );
 
             string role = Roles.User;
