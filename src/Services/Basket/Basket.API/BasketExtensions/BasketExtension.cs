@@ -5,12 +5,13 @@ using Basket.API.Services;
 using BuildingBlocks.Abstractions;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.CorrelationId;
-using BuildingBlocks.Messaging.Events.Extensions;
+using BuildingBlocks.Messaging.Events;
 using Catalog.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Security.Claims;
@@ -61,7 +62,10 @@ namespace Basket.API.BasketExtensions
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
 
-                        RoleClaimType = ClaimTypes.Role
+                        NameClaimType = JwtRegisteredClaimNames.Sub,
+                        RoleClaimType = ClaimTypes.Role,
+
+
                     };
                 });
 
