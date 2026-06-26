@@ -39,7 +39,7 @@ namespace AuthService.Data
             var superAdmin = GetSuperAdmin();
             if (await userManager.FindByEmailAsync(superAdmin.Email!) is null)
             {
-                var adminResult = await userManager.CreateAsync(superAdmin ,"Admin12345@");
+                var adminResult = await userManager.CreateAsync(superAdmin, "Admin12345@");
                 if (!adminResult.Succeeded)
                     throw new Exception($"Failed to create user: {string.Join(", ", adminResult.Errors.Select(e => e.Description))}");
 
@@ -89,35 +89,40 @@ namespace AuthService.Data
                 email: "matin@gmail.com",
                 username: "matin@gmail.com",
                 firstname: "Matin",
-                lastname: "shahmoradi"
+                lastname: "shahmoradi",
+                phoneNumber: "09999000000"
                 ),
 
             ApplicationUser.CreateUser(
                 email: "saman@gmail.com",
                 username: "saman@gmail.com",
                 firstname: "saman",
-                lastname: "hosseiny"
+                lastname: "hosseiny",
+                phoneNumber: "09999000000"
                 ),
 
             ApplicationUser.CreateUser(
                 email: "amin@gmail.com",
                 username: "amin@gmail.com",
                 firstname: "amin",
-                lastname: "chahardoli"
+                lastname: "chahardoli",
+                phoneNumber: "09999000000"
                 ),
 
             ApplicationUser.CreateUser(
                 email: "kambiz@gmail.com",
                 username: "kambiz@gmail.com",
                 firstname: "kambiz",
-                lastname: "dirbaz"
+                lastname: "dirbaz",
+                phoneNumber: "09999000000"
                 ),
 
             ApplicationUser.CreateUser(
                 email: "ali@gmail.com",
                 username: "ali@gmail.com",
                 firstname: "ali",
-                lastname: "keramat"
+                lastname: "keramat",
+                phoneNumber: "09999000000"
                 ),
         };
 
