@@ -15,8 +15,8 @@ namespace AuthService.Repositories
             {
                 new Claim(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Email!),
-                new Claim(ClaimTypes.Email,user.Email!),
-                new Claim(ClaimTypes.MobilePhone, user.PhoneNumber!),
+                new Claim(JwtRegisteredClaimNames.Email,user.Email!),
+                new Claim(JwtRegisteredClaimNames.PhoneNumber, user.PhoneNumber!),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
