@@ -1,3 +1,4 @@
+using BuildingBlocks.CustomExceptions;
 using BuildingBlocks.Infrastracture.CorrelationId;
 using Catalog.API.CatalogExtensions;
 using Catalog.API.Grpc;
@@ -19,6 +20,7 @@ builder.Host.UseSerilog((context, config) =>
 // Add services to the container.
 
 var app = builder.Build();
+app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     await app.Populate();

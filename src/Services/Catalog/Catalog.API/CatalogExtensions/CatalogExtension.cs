@@ -1,7 +1,8 @@
 ﻿using BuildingBlocks.Abstractions;
+using BuildingBlocks.CustomExceptions;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.CorrelationId;
-using BuildingBlocks.Messaging.Events.Extensions;
+using BuildingBlocks.Messaging.Events;
 using Catalog.API.EventHandlers;
 using Catalog.API.Tickets.CurrentUser;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,7 +46,6 @@ namespace Catalog.API.CatalogExtensions
                             Encoding.UTF8.GetBytes(jwtSetting["Key"]!)),
 
                         RoleClaimType = ClaimTypes.Role,
-                        NameClaimType = ClaimTypes.Name,
                     };
                 });
             services.AddAuthorization(options =>
@@ -60,21 +60,23 @@ namespace Catalog.API.CatalogExtensions
             services.AddValidatorsFromAssembly(assembly);
 
             //DI configurations
-            services.AddScoped<ICatalogDbContext, CatalogDbContext>();
-            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
-            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-            services.AddScoped<ICurrentUser, CurrentUser>();
 
             services.AddDbContext<CatalogDbContext>((sp, cfg) =>
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+
             services.AddGrpc();
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
             services.AddCorrelationId();
-            services.AddCarter();
+            services.AddExceptionHandler<CustomExceptionHandler>();
 
+            services.AddCarter();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
             services.AddHttpContextAccessor();

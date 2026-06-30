@@ -81,7 +81,8 @@ namespace AuthService.Data
             Email = "superAdmin@gmail.com",
             UserName = "superAdmin@gmail.com",
             FirstName = "matin",
-            LastName = "shahmoradi"
+            LastName = "shahmoradi",
+            PhoneNumber = "09852156471"
         };
         private static IEnumerable<ApplicationUser> GetUsers() => new List<ApplicationUser>
         {
