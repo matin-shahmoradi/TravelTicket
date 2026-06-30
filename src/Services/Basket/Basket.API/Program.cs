@@ -22,6 +22,7 @@ app.UseHealthChecks("/health-basket", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+app.UseExceptionHandler();
 app.UseCorrelationId();
 app.UseHttpsRedirection();
 app.UseAuthentication();
