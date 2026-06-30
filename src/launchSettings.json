@@ -5,7 +5,9 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "catalog.api": "StartDebugging",
-        "authservice": "StartDebugging"
+        "authservice": "StartDebugging",
+        "ordering.api": "StartDebugging",
+        "basket.api": "StartDebugging"
       }
     }
   }

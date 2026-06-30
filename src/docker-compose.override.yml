@@ -11,6 +11,12 @@ services:
         - "5433:5432"
     volumes:
         - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d CatalogDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   basketDb:
     image: postgres
     container_name: basketDb
@@ -23,12 +29,22 @@ services:
         - "5434:5432"
     volumes:
         - basket_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d BasketDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     
   redis:
     container_name: RedisDistributedCache
     restart: always
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
   
   orderingDb:
     image: postgres
@@ -42,37 +58,29 @@ services:
         - "5435:5432"
     volumes:
         - ordering_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ORDER_USER} -d OrderingDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   authDb:
     image: postgres
     container_name: authDb
     environment:
       - POSTGRES_USER=${AUTH_USERNAME_DB}
       - POSTGRES_PASSWORD=${AUTH_PASSWORD_DB}
-      - POSTGRES_DB=OrderingDb
+      - POSTGRES_DB=AuthDb
     restart: always
     ports:
         - "5440:5432"
     volumes:
         - auth_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_USERNAME_DB} -d AuthDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   #--------------------------------------------------------------------------------------------------------------------
-  catalog.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Server=catalogDb;Port=5433;Database=CatalogDb;User Id=${POSTGRES_USER};password=${POSTGRES_PASSWORD};Include Error Detail=true  
-    depends_on:
-      - catalogDb
-    ports:
-      - "6000:8080"
-      - "6060:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-    
-
   seq:
     container_name: seq
     environment: 
@@ -96,6 +104,12 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     
   papercut:
     image: changemakerstudiosus/papercut-smtp:latest
@@ -104,49 +118,84 @@ services:
       - "8080:8080"
       - "2525:2525"
     restart: unless-stopped
-  # ordering.api:
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_HTTP_PORTS=8080
-  #     - ASPNETCORE_HTTPS_PORTS=8081
-  #     - ConnectionStrings__Database=Server=catalogDb;Port=5433;Database=CatalogDb;User Id=${POSTGRES_USER};password=${POSTGRES_PASSWORD};Include Error Detail=true  
-  #   depends_on:
-  #     - catalogDb
-  #   ports:
-  #     - "6000:8080"
-  #     - "6060:8081"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  # basket.api:
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_HTTP_PORTS=8080
-  #     - ASPNETCORE_HTTPS_PORTS=8081
-  #     - ConnectionStrings__Database=Server=basketDb;Port=5434;Database=BasketDb;User Id=${POSTGRES_USER};password=${POSTGRES_PASSWORD};Include Error Detail=true
-  #     - ConnectionStrings__Redis=distributedcache:6379
-  #   depends_on:
-  #     - basketDb
-  #     - distributedcache 
-  #   ports:
-  #     - "6001:8080"
-  #     - "6061:8081"
-  #   volumes:
-  #     - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  #     - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-  #     - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+#-----------------------------------------------------------------------------------------------------------
+  catalog.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=CatalogDb;Port=5432;Database=OrderingDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - MessageBroker__Host=amqp://messagebus:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
+    ports:
+      - "6000:8080" 
+    depends_on:
+      catalogDb:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  ordering.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__PostgresDefaultConnection=Host=orderingDb;Port=5432;Database=OrderingDb;Username=${ORDER_USER};Password=${ORDER_PASSWORD};
+      - MessageBroker__Host=amqp://messagebus:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
+    ports:
+      - "6080:8080"
+    depends_on:
+      orderingDb:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
   authservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=authDb;Port=5432;Database=AuthDb;Username=${AUTH_USERNAME_DB};Password=${AUTH_PASSWORD_DB};
     ports:
-      - "8080"
-      - "8081"
+      - "6066:8080"
+    depends_on:
+       authDb :
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  basket.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=basketDb;Port=5432;Database=BasketDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__Redis=redis:6379 
+      - MessageBroker__Host=amqp://messagebus:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
+    ports:
+      - "6003:8080"
+    depends_on:
+      basketDb :
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      messagebus:
+        condition: service_healthy
+    restart: always
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

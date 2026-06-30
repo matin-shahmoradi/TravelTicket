@@ -26,11 +26,12 @@ services:
 
   papercut:
     image: changemakerstudiosus/papercut-smtp:latest
-  # basket.api:
-  #   image: basketapi
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Basket/Basket.API/Dockerfile
+
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
 
   authservice:
     image: ${DOCKER_REGISTRY-}authservice
@@ -38,10 +39,19 @@ services:
       context: .
       dockerfile: Services/Auth/AuthService/Dockerfile
 
+  basket.api:
+    image: ${DOCKER_REGISTRY-}basketapi
+    build:
+      context: .
+      dockerfile: Services/Basket/Basket.API/Dockerfile
+
 volumes:
   postgres_data:
   basket_postgres:
   ordering_postgres:
   auth_postgres:
   rabbitmq_data:
+
+
+
 
