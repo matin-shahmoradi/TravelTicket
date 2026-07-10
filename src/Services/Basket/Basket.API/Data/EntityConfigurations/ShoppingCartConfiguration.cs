@@ -26,6 +26,9 @@ namespace Basket.API.Data.EntityConfigurations
             builder.HasMany(i => i.Items)
                 .WithOne()
                 .HasForeignKey(si => si.ShoppingCartId);
+
+            builder.Property(x => x.Version)
+                .IsConcurrencyToken();
         }
     }
 }

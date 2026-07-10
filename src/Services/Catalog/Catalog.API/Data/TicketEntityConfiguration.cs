@@ -1,5 +1,4 @@
 ﻿using Catalog.API.Data.Converters;
-using Catalog.API.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -30,6 +29,9 @@ namespace Catalog.API.Data
 
             builder.Property(t => t.Price)
                 .IsRequired();
+
+            builder.Property(x => x.Version)
+                .IsConcurrencyToken();
         }
     }
 }

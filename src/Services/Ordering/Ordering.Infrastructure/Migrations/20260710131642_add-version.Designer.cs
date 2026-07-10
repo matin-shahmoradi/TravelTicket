@@ -8,12 +8,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Ordering.Infrastructure.Data;
 
 #nullable disable
-#pragma warning disable CS8981
+# pragma warning disable 8981
 namespace Ordering.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20260624190452_delete-all-related-ordername-column")]
-    partial class deleteallrelatedordernamecolumn
+    [Migration("20260710131642_add-version")]
+    partial class addversion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,7 +61,12 @@ namespace Ordering.Infrastructure.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("character varying(11)");
 
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("NationalCode");
 
                     b.HasIndex("PhoneNumber");
 
@@ -96,6 +101,10 @@ namespace Ordering.Infrastructure.Migrations
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
+
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -132,6 +141,9 @@ namespace Ordering.Infrastructure.Migrations
 
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

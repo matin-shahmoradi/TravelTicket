@@ -58,13 +58,16 @@ namespace Ordering.Infrastructure.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("character varying(11)");
 
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NationalCode");
 
                     b.HasIndex("PhoneNumber");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Ordering.Domain.Models.Order", b =>
@@ -96,11 +99,15 @@ namespace Ordering.Infrastructure.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
 
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Ordering.Domain.Models.OrderItem", b =>
@@ -132,11 +139,14 @@ namespace Ordering.Infrastructure.Migrations
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
 
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Ordering.Domain.Models.Order", b =>

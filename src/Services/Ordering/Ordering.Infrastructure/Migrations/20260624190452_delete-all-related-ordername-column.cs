@@ -4,7 +4,8 @@
 
 namespace Ordering.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+#pragma warning disable CS8981
+    /// <inheritdoc /> 
     public partial class deleteallrelatedordernamecolumn : Migration
     {
         /// <inheritdoc />
