@@ -19,12 +19,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
     <PackageReference Include="Mapster" Version="10.0.10" />
     <PackageReference Include="MassTransit" Version="8.5.10" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.10" />
     <PackageReference Include="MediatR" Version="14.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0" />
