@@ -12,7 +12,13 @@ namespace BuildingBlocks.EntityFramwork
 
             return await strategy.ExecuteAsync(async () =>
             {
-                await using var transaction = dbContext.Database.BeginTransaction();
+                if (dbContext.Database.CurrentTransaction != null)
+                {
+                    var result = await action(cancellationToken);
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                    return result;
+                }
+                await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
                 try
                 {
                     var result = await action(cancellationToken);
