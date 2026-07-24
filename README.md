@@ -112,14 +112,14 @@ Run the following commands to [Config SSL](https://docs.microsoft.com/en-us/aspn
 
 #### Windows using Linux containers
 ```bash
-dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p password
+dotnet dev-certs https -ep ./https/dev-cert.pfx -p password
 dotnet dev-certs https --trust
 ```
 > Note: for running this command in `powershell` use `$env:USERPROFILE` instead of `%USERPROFILE%`*
 
 #### macOS or Linux
 ```bash
-dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p $CREDENTIAL_PLACEHOLDER$
+dotnet dev-certs https -ep ${HOME}/.aspnet/https/dev-cert.pfx -p $CREDENTIAL_PLACEHOLDER$
 dotnet dev-certs https --trust
 ```
 
