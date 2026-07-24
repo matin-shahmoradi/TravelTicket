@@ -3,8 +3,11 @@ using Basket.API.Grpc;
 using Basket.API.Grpc.GrpcClients;
 using Basket.API.Services;
 using BuildingBlocks.Abstractions;
+using BuildingBlocks.EntityFramwork;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.CorrelationId;
+using BuildingBlocks.Infrastracture.Outbox;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
 using Catalog.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,6 +33,8 @@ namespace Basket.API.BasketExtensions
                 config.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             });
+            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.AddDbContext<BacketDbContext>((sp, cfg) =>
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
@@ -86,14 +91,19 @@ namespace Basket.API.BasketExtensions
                 option.Address = new Uri(configuration["GrpcServices:Catalog"]!);
             });
 
+            services.OutboxServices(configuration);
+
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ICatalogGrpcClient, CatalogGrpcClient>();
-            services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
-            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-            services.AddScoped<IUnitOfWork, UnitOfWorkRepository>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork<BacketDbContext>>();
+            services.AddScoped<IBasketDbContext, BacketDbContext>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
+
+            services.AddScoped<ITransactionExecutor, EfTransactionExecutor<BacketDbContext>>();
+            services.AddScoped<IOutboxProcessor, OutboxProcessor<BacketDbContext>>();
 
             services.AddCarter();
             services.AddValidatorsFromAssembly(assembly);

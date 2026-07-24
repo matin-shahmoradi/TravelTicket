@@ -1,7 +1,10 @@
 ﻿using BuildingBlocks.Abstractions;
 using BuildingBlocks.CustomExceptions;
+using BuildingBlocks.EntityFramwork;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.CorrelationId;
+using BuildingBlocks.Infrastracture.Outbox;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
 using Catalog.API.EventHandlers;
 using Catalog.API.Tickets.CurrentUser;
@@ -66,10 +69,16 @@ namespace Catalog.API.CatalogExtensions
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
+
+            services.OutboxServices(configuration);
+
             services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ITransactionExecutor, EfTransactionExecutor<CatalogDbContext>>();
+            services.AddScoped<IOutboxProcessor, OutboxProcessor<CatalogDbContext>>();
+
 
             services.AddGrpc();
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());

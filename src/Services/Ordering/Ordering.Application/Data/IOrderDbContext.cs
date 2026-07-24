@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BuildingBlocks.Infrastracture.Outbox;
+using Microsoft.EntityFrameworkCore;
 namespace Ordering.Application.Data
 {
     public interface IOrderDbContext
@@ -6,7 +7,7 @@ namespace Ordering.Application.Data
         DbSet<Order> Orders { get; }
         DbSet<OrderItem> OrderItems { get; }
         DbSet<Customer> Customers { get; }
-
+        DbSet<OutboxMessage> OutboxMessages { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
     }

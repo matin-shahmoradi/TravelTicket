@@ -1,23 +1,21 @@
 ﻿using BuildingBlocks.Infrastracture.Outbox;
 using Microsoft.EntityFrameworkCore;
+using Payment.api.Domain;
 using System.Reflection;
 
-namespace Catalog.API.Data
+namespace Payment.api.Data
 {
-    public class CatalogDbContext : DbContext, ICatalogDbContext
+    public sealed class PaymentDbContext : DbContext
     {
-        public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
-        {
+        public PaymentDbContext(DbContextOptions<PaymentDbContext> options) : base(options)
+        { }
 
-        }
-
-        public DbSet<Ticket> Tickets => Set<Ticket>();
+        public DbSet<PaymentModel> Payments => Set<PaymentModel>();
         public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             modelBuilder.ApplyConfiguration(new OutboxMessageBaseEntityConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
     }
