@@ -56,6 +56,11 @@ namespace Payment.api.Domain
             };
         }
 
+        public void MarkPending()
+        {
+            Status = PaymentStatus.Pending;
+        }
+
         public void MarkGatewayRequested(string authority)
         {
             if (Status != PaymentStatus.Pending)
@@ -66,6 +71,7 @@ namespace Payment.api.Domain
 
             Authority = authority;
             Status = PaymentStatus.GatewayRequested;
+            //AddDomainEvents(new PaymentRequestedEvent(Id.Value, Authority, Status.ToString()));
         }
 
         public void MarkSucceeded(
@@ -104,6 +110,8 @@ namespace Payment.api.Domain
 
             Status = PaymentStatus.Failed;
             FailureReason = reason;
+
+            AddDomainEvents(new PaymentFailedDomainEvent(OrderId.Value, Status));
         }
     }
 }
