@@ -12,20 +12,24 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
         public async Task<Result<Guid>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
             var order = CreateNewOrder(command.OrderDto);
-            var customer = await orderContext.Customers
-                .Where(x => x.Id == order.Item2.Id)
-                .FirstOrDefaultAsync(cancellationToken);
+
             try
             {
+                var customer = await orderContext.Customers
+                    .Where(x => x.Id == order.Item2.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
                 await orderContext.Orders.AddAsync(order.Item1);
-                await orderContext.Customers.AddAsync(order.Item2);
+                if (customer is null)
+                    await orderContext.Customers.AddAsync(order.Item2);
+
+                await orderContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception e)
             {
                 logger.LogError("Failed to create new order. error : {error} ", e.Message);
                 return Result<Guid>.Failure(Error.Internal_Server(message: e.Message));
             }
-            await orderContext.SaveChangesAsync(cancellationToken);
 
             logger.LogInformation("Order created successfully : {order}", order);
             return Result<Guid>.Success(command.OrderDto.Id);
