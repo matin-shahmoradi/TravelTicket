@@ -5,7 +5,7 @@
         public Guid CustomerId { get; set; }
         public string Email { get; set; } = default!;
         public string PhoneNumber { get; set; } = default!;
-        public List<BasketCheckOutIntegrationEventItem> Items = new();
+        public List<BasketCheckOutIntegrationEventItem> Items { get; set; } = new();
     }
 
     public record BasketCheckOutIntegrationEventItem(Guid TicketId, int Quantity, decimal Price);
