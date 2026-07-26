@@ -1,8 +1,10 @@
 using BuildingBlocks.Extensions;
 using BuildingBlocks.Infrastracture.CorrelationId;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +32,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSetting["Issuer"],
             ValidAudience = jwtSetting["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSetting["Key"]!))
+                Encoding.UTF8.GetBytes(jwtSetting["Key"]!)),
+            NameClaimType = JwtRegisteredClaimNames.Sub,
+            RoleClaimType = ClaimTypes.Role,
         };
     });
 builder.Services.AddHealthChecks();
