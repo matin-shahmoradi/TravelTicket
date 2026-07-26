@@ -1,5 +1,7 @@
 using Basket.API.BasketExtensions;
 using BuildingBlocks.Infrastracture.CorrelationId;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
+using Hangfire;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -22,12 +24,18 @@ app.UseHealthChecks("/health-basket", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+
 app.UseExceptionHandler();
+app.UseBackgroundJobs("basket-outbox-processor");
 app.UseCorrelationId();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();
+app.MapHangfireDashboard(options: new DashboardOptions
+{
+    Authorization = []
+});
 app.MapGet("/", () => "Basket.API");
 
 app.Run();

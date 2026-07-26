@@ -1,7 +1,8 @@
-using BuildingBlocks.CustomExceptions;
 using BuildingBlocks.Infrastracture.CorrelationId;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using Catalog.API.CatalogExtensions;
 using Catalog.API.Grpc;
+using Hangfire;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
@@ -33,10 +34,15 @@ app.UseHealthChecks("/health-catalog", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
+app.UseBackgroundJobs("catalog-outbox-processor");
 app.UseCorrelationId();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();
+app.MapHangfireDashboard(options: new DashboardOptions
+{
+    Authorization = []
+});
 app.MapGrpcService<CatalogRpcService>();
 app.MapGet("/", () => "Hello World!");
 

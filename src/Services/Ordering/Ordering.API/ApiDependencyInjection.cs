@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Infrastracture.CorrelationId;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using Carter;
 using System.Reflection;
 
@@ -21,6 +22,7 @@ namespace Ordering.API
         public static WebApplication UseApiService(this WebApplication app)
         {
             app.UseCorrelationId();
+            app.UseBackgroundJobs("order-outbox-processor");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapCarter();
