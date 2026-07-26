@@ -31,7 +31,7 @@ namespace Basket.API.Services
             ?? throw new Exception("Null User email");
 
         public string PhoneNumber =>
-            _principal?.FindFirstValue(ClaimTypes.MobilePhone)
+            _principal?.FindFirstValue(JwtRegisteredClaimNames.PhoneNumber)
             ?? throw new Exception("Null User phone number");
 
         public IReadOnlyCollection<string> Roles =>
