@@ -28,14 +28,13 @@ namespace Ordering.Domain.Models
             return order;
         }
 
-        public void Update(OrderStatus orderStatus)
+        public void UpdateOrderStatus(OrderStatus orderStatus)
         {
-            var order = new Order
-            {
-                OrderStatus = orderStatus
-            };
+            if (OrderStatus == orderStatus)
+                return;
 
-            order.AddDomainEvents(new OrderUpdatedEvent(this));
+            OrderStatus = orderStatus;
+            AddDomainEvents(new OrderUpdatedEvent(this));
         }
 
         public void Add(TicketId ticketId, int quantity, decimal price)
@@ -43,7 +42,7 @@ namespace Ordering.Domain.Models
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
             ArgumentOutOfRangeException.ThrowIfNegative(quantity);
 
-            var orderItem = new OrderItem(Id, ticketId, quantity, price);
+            var orderItem = OrderItem.AddItem(Id, ticketId, quantity, price);
 
             _orderItems.Add(orderItem);
         }
