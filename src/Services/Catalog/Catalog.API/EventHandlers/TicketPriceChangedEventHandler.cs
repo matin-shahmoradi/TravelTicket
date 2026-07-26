@@ -1,15 +1,16 @@
-﻿using BuildingBlocks.Messaging.Events.CatalogEvents;
-using MassTransit;
+﻿using BuildingBlocks.Infrastracture.Outbox.Extensions;
+using BuildingBlocks.Logger;
+using BuildingBlocks.Messaging.Events.CatalogEvents;
 
 namespace Catalog.API.EventHandlers
 {
-    public class TicketPriceChangedEventHandler
-        (IBus bus,ILogger<TicketPriceChangedEventHandler> logger)
+    public class TicketPriceChangedEventHandler(
+        ICatalogDbContext context,
+        ILogger<TicketPriceChangedEventHandler> logger)
         : INotificationHandler<TicketPriceChangedEvent>
     {
         public async Task Handle(TicketPriceChangedEvent notification, CancellationToken cancellationToken)
         {
-            logger.LogInformation("Domain Event handled : {DomainEvent}", notification.GetType().Name);
             var ticketPriceChangedIntegrationEvent = new TicketPriceChangedIntegrationEvent
             {
                 TicketId = notification.ticket.Id.Value,
@@ -19,8 +20,17 @@ namespace Catalog.API.EventHandlers
                 TravelDate = notification.ticket.TravelDate,
                 Price = notification.ticket.Price,
             };
+            try
+            {
+                context.OutboxMessages.AddIntegrationEvent(ticketPriceChangedIntegrationEvent);
+                await context.SaveChangesAsync(cancellationToken);
+                logger.LogEventHandler(notification.GetType().Name);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to handle {event}", notification.GetType().Name);
+            }
 
-           await bus.Publish(ticketPriceChangedIntegrationEvent , cancellationToken);
         }
     }
 }

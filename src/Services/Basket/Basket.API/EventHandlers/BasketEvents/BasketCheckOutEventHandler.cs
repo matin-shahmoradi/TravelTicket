@@ -1,19 +1,20 @@
-﻿using Basket.API.Events;
+﻿using Basket.API.Data.Repositories;
+using Basket.API.Events;
 using BuildingBlocks.Abstractions;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
+using BuildingBlocks.Logger;
 using BuildingBlocks.Messaging.Events.BasketEvents;
-using MassTransit;
 
 namespace Basket.API.EventHandlers.BasketEvents
 {
     public class BasketCheckOutEventHandler(
-        IBus bus,
+        IBasketDbContext context,
         ICurrentUser currentUser,
         ILogger<BasketCheckOutEventHandler> logger)
         : INotificationHandler<BasketCheckOutEvent>
     {
-        public Task Handle(BasketCheckOutEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(BasketCheckOutEvent notification, CancellationToken cancellationToken)
         {
-            logger.LogInformation("[EVENT] Event handled : {Event}", notification.GetType().Name);
             //TODO : add customer phone number in auth service
             var BasketCheckoutedIntegrationEvent = new BasketCheckOutIntegrationEvent
             {
@@ -27,8 +28,18 @@ namespace Basket.API.EventHandlers.BasketEvents
                     Quantity: x.Quantity
                 )).ToList()
             };
+            try
+            {
+                context.outboxMessages.AddIntegrationEvent(BasketCheckoutedIntegrationEvent);
+                await context.SaveChangesAsync(cancellationToken);
+                logger.LogEventHandler(notification.GetType().Name);
 
-            return bus.Publish(BasketCheckoutedIntegrationEvent);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to handle {event}", notification.GetType().Name);
+            }
+
         }
     }
 }

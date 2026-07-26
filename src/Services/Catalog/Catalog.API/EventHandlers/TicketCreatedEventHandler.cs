@@ -1,19 +1,17 @@
-﻿using BuildingBlocks.Messaging.Events.CatalogEvents;
-using MassTransit;
+﻿using BuildingBlocks.Infrastracture.Outbox.Extensions;
+using BuildingBlocks.Logger;
+using BuildingBlocks.Messaging.Events.CatalogEvents;
 
 namespace Catalog.API.EventHandlers
 {
     public class TicketCreatedEventHandler(
-        IBus bus,
-        ILogger<TicketCreatedEventHandler> logger) 
+        ICatalogDbContext context,
+        ILogger<TicketCreatedEventHandler> logger)
         : INotificationHandler<TicketCreatedEvent>
     {
-        // TO DO : implement TicketCreatedEventIntegration After learned rabbitmq.
         public async Task Handle(TicketCreatedEvent notification, CancellationToken cancellationToken)
         {
-            logger.LogInformation("Domain Event handled : {DomainEvent}",notification.GetType().Name);
-
-            var ticketCreatedIntegrationEvent = new TicketCreatedIntegrationEvent
+            var integrationEvent = new TicketCreatedIntegrationEvent
             {
                 TicketId = notification.Ticket.Id.Value,
                 Origin = notification.Ticket.Origin,
@@ -22,8 +20,17 @@ namespace Catalog.API.EventHandlers
                 TravelDate = notification.Ticket.TravelDate,
                 Price = notification.Ticket.Price,
             };
+            try
+            {
+                context.OutboxMessages.AddIntegrationEvent(integrationEvent);
+                await context.SaveChangesAsync(cancellationToken);
+                logger.LogEventHandler(notification.GetType().Name);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to handle {event}", notification.GetType().Name);
+            }
 
-            await bus.Publish(ticketCreatedIntegrationEvent);
         }
     }
 }
