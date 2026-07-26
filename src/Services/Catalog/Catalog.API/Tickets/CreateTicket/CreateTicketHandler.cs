@@ -3,12 +3,14 @@
 namespace Catalog.API.Tickets.CreateTicket
 {
     public record CreateTicketCommand(TicketRequestDTO CreateTicketRequest) : ICommand<Result<Guid>>;
-    public sealed class CreateTicketCommandHandler(ICatalogDbContext catalogDb)
+    public sealed class CreateTicketCommandHandler(
+        ICatalogDbContext context,
+        ILogger<CreateTicketCommand> logger)
         : ICommandHandler<CreateTicketCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
         {
-            // Creat new Ticket object.
+            // Create new Ticket object.
             var ticket = Ticket.Create(
                 id: TicketId.New(),
                 origin: request.CreateTicketRequest.Origin,
@@ -19,11 +21,18 @@ namespace Catalog.API.Tickets.CreateTicket
                 );
 
             // Save to database.
-            await catalogDb.Tickets.AddAsync(ticket);
-            await catalogDb.SaveChangesAsync(cancellationToken);
-
-            // return result using Result Pattern.
-            return Result<Guid>.Success(ticket.Id.Value);
+            try
+            {
+                await context.Tickets.AddAsync(ticket);
+                await context.SaveChangesAsync(cancellationToken);
+                logger.LogInformation("Ticket {id} Created successfully", ticket.Id.Value);
+                return Result<Guid>.Success(ticket.Id.Value);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to create ticket {id}", ticket.Id.Value);
+                return Result<Guid>.Failure(Error.Internal_Server(ex.Message));
+            }
         }
     }
 }
