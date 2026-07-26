@@ -52,7 +52,7 @@ namespace Basket.API.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("ShoppingCarts");
+                    b.ToTable("ShoppingCarts", (string)null);
                 });
 
             modelBuilder.Entity("Basket.API.Model.ShoppingCartItem", b =>
@@ -93,7 +93,7 @@ namespace Basket.API.Migrations
 
                     b.HasIndex("ShoppingCartId");
 
-                    b.ToTable("ShoppingCartItems");
+                    b.ToTable("ShoppingCartItems", (string)null);
                 });
 
             modelBuilder.Entity("BuildingBlocks.Infrastracture.Outbox.OutboxMessage", b =>

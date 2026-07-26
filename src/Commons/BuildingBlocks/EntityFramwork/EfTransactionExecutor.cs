@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BuildingBlocks.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace BuildingBlocks.EntityFramwork

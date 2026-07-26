@@ -13,7 +13,7 @@ namespace Ordering.Infrastructure.EntityConfiguration
 
             builder.Property(x => x.Name)
                 .HasMaxLength(150)
-                .IsRequired();       
+                .IsRequired();
 
             builder.Property(x => x.NationalCode)
                 .HasMaxLength(10)
@@ -25,6 +25,8 @@ namespace Ordering.Infrastructure.EntityConfiguration
 
             builder.Property(x => x.Email)
                 .HasMaxLength(255);
+            builder.Property(x => x.Version)
+                .IsConcurrencyToken();
 
             builder.HasIndex(x => x.PhoneNumber);
             builder.HasIndex(x => x.NationalCode);

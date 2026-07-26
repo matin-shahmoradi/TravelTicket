@@ -17,6 +17,9 @@ namespace Ordering.Infrastructure.EntityConfiguration
 
             builder.Property(q => q.Quantity).IsRequired();
             builder.Property(p => p.Price).IsRequired();
+
+            builder.Property(x => x.Version)
+                .IsConcurrencyToken();
         }
     }
 }

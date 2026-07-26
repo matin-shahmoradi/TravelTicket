@@ -50,6 +50,13 @@
         {
             return new Error(message, code, errorType);
         }
+        public static Error UnprocessableEntity(
+            string message = "Unprocessable error occured !",
+            int code = 422,
+            ErrorType errorType = ErrorType.UNPROCESSABLE_ENTITY_ERROR)
+        {
+            return new Error(message, code, errorType);
+        }
         public static Error Internal_Server(
             string message = "Internal server error occured!",
             int code = 500,

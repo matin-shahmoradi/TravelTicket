@@ -23,8 +23,12 @@
     <Project Path="Services/Ordering/Ordering.Domain/Ordering.Domain.csproj" />
     <Project Path="Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" Id="134044cc-b368-41f7-8197-a1840624262e" />
   </Folder>
+  <Folder Name="/Services/Payment/">
+    <Project Path="Services/Payment/Payment.api/Payment.api.csproj" Id="4652784b-4299-4941-a98b-ee065f4ae6d8" />
+  </Folder>
   <Folder Name="/Tests/">
     <Project Path="../AuthSerive.UnitTests/AuthService.UnitTests.csproj" Id="3bc9cdf1-e6ee-488b-8a70-4714d51e49a0" />
+    <Project Path="Services/Payment/Tests/TestProject1/PaymentService.Test.csproj" Id="eae36e6a-1b66-4f69-86f8-409c2314e8b2" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />

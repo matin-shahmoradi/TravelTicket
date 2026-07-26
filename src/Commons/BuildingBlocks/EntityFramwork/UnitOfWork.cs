@@ -1,14 +1,14 @@
-﻿using Basket.API.Data.Repositories;
+﻿using BuildingBlocks.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BuildingBlocks.EntityFramwork
 {
-    public sealed class UnitOfWork<TContext>(TContext context) : IUnitOfWork
-        where TContext : DbContext
+    public sealed class UnitOfWork<TDbContext>(TDbContext dbContext) : IUnitOfWork
+        where TDbContext : DbContext
     {
-        public async Task SaveChangesAsync(CancellationToken cancellationToken)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            await context.SaveChangesAsync(cancellationToken);
+            return await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

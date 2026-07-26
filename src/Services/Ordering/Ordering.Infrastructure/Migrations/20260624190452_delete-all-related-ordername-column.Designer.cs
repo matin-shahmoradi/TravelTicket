@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Ordering.Infrastructure.Data;
 
 #nullable disable
-
+#pragma warning disable CS8981
 namespace Ordering.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]

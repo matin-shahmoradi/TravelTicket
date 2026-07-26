@@ -89,6 +89,10 @@ namespace Catalog.API.Migrations
                     b.Property<DateTime>("TravelDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.ToTable("Tickets");

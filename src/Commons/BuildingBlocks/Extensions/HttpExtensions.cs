@@ -33,6 +33,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.UNAUTHORIZED_ERROR => "Unauthorized Error",
                 ErrorType.FORBIDDEN_ERROR => "Forbidden Error",
                 ErrorType.CONFLICT_ERROR => "Conflict Error",
+                ErrorType.UNPROCESSABLE_ENTITY_ERROR => "Unprocessable Entity Error",
                 ErrorType.INTERNAL_SERVER_ERROR => "Internal Server Error",
                 _ => string.Empty,
             };
@@ -46,6 +47,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.UNAUTHORIZED_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2",
                 ErrorType.FORBIDDEN_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.4",
                 ErrorType.CONFLICT_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10",
+                ErrorType.UNPROCESSABLE_ENTITY_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.21",
                 ErrorType.INTERNAL_SERVER_ERROR => "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1",
                 _ => string.Empty,
             };
@@ -59,6 +61,7 @@ namespace BuildingBlocks.Extensions
                 ErrorType.UNAUTHORIZED_ERROR => StatusCodes.Status401Unauthorized,
                 ErrorType.FORBIDDEN_ERROR => StatusCodes.Status403Forbidden,
                 ErrorType.CONFLICT_ERROR => StatusCodes.Status409Conflict,
+                ErrorType.UNPROCESSABLE_ENTITY_ERROR => StatusCodes.Status422UnprocessableEntity,
                 ErrorType.INTERNAL_SERVER_ERROR => StatusCodes.Status500InternalServerError,
                 _ => StatusCodes.Status500InternalServerError,
             };
