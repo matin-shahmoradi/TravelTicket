@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Messaging.Events.BasketEvents;
+﻿using BuildingBlocks.Logger;
+using BuildingBlocks.Messaging.Events.BasketEvents;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace Ordering.Application.Events
     {
         public async Task Consume(ConsumeContext<BasketCheckOutIntegrationEvent> context)
         {
-            logger.LogWarning("[EVENT] EVENT RECEIVED : {event}", context.MessageId);
+            logger.LogEventReceived(context.MessageId, nameof(BasketCheckOutEventConsumer));
 
             Guid id = Guid.NewGuid();
             var item = context.Message.Items;
@@ -43,7 +44,7 @@ namespace Ordering.Application.Events
                 logger.LogError("[EVENT HANDLED] : Failed to create order : {result}", result.Error);
                 return;
             }
-            logger.LogInformation("[EVENT HANDLED] : Order Created successfully {result}", result.Value);
+            logger.LogEventConsumed(context.MessageId, nameof(BasketCheckOutEventConsumer));
         }
     }
 }
