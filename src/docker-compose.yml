@@ -10,6 +10,8 @@ services:
 
   authDb:
     image: postgres
+  paymentDb:
+    image: postgres
   redis:
     image: redis
 
@@ -45,12 +47,24 @@ services:
       context: .
       dockerfile: Services/Basket/Basket.API/Dockerfile
 
+  payment.api:
+    image: ${DOCKER_REGISTRY-}paymentapi
+    build:
+      context: .
+      dockerfile: Services/Payment/Payment.api/Dockerfile
+
 volumes:
   postgres_data:
   basket_postgres:
   ordering_postgres:
   auth_postgres:
   rabbitmq_data:
+  payment_postgres:
+
+
+
+
+
 
 
 

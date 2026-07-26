@@ -52,14 +52,14 @@ services:
     environment:
       - POSTGRES_USER=${ORDER_USER}
       - POSTGRES_PASSWORD=${ORDER_PASSWORD}
-      - POSTGRES_DB=OrderingDb
+      - POSTGRES_DB=OrderDb
     restart: always
     ports:
         - "5435:5432"
     volumes:
         - ordering_postgres:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${ORDER_USER} -d OrderingDb"]
+      test: ["CMD-SHELL", "pg_isready -U ${ORDER_USER} -d OrderDb"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -80,17 +80,35 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+
+  paymentDb:
+    image: postgres
+    container_name : PaymentDb
+    environment:
+      - POSTGRES_USER=${PAYMENT_USERNAME_DB}
+      - POSTGRES_PASSWORD=${PAYMENT_PASSWORD_DB}
+      - POSTGRES_DB=PaymentDb
+    restart: always
+    ports:
+        - "5450:5432"
+    volumes:
+        - payment_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_USERNAME_DB} -d PaymentDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   #--------------------------------------------------------------------------------------------------------------------
   seq:
     container_name: seq
     environment: 
       - ACCEPT_EULA=Y
       - SEQ_FIRSTRUN_NOAUTHENTICATION=True 
-    restart: always
     ports:
       - "5341:5341"
-      - "9091:80"
-
+      - "9090:80"
+    restart: always
 
   messagebus :
     image: rabbitmq:management
@@ -116,15 +134,15 @@ services:
     container_name: paperCut
     ports:
       - "8080:8080"
-      - "2525:2525"
-    restart: unless-stopped
+      - "2526:2525"
+    restart: always
 
 #-----------------------------------------------------------------------------------------------------------
   catalog.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Host=CatalogDb;Port=5432;Database=OrderingDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__DefaultConnection=Host=catalogDb;Port=5432;Database=CatalogDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - MessageBroker__Host=amqp://messagebus:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
@@ -133,6 +151,14 @@ services:
     depends_on:
       catalogDb:
         condition: service_healthy
+      messagebus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health-catalog || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     restart: always
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
@@ -144,7 +170,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__PostgresDefaultConnection=Host=orderingDb;Port=5432;Database=OrderingDb;Username=${ORDER_USER};Password=${ORDER_PASSWORD};
+      - ConnectionStrings__DefaultConnection=Host=orderingDb;Port=5432;Database=OrderDb;Username=${ORDER_USER};Password=${ORDER_PASSWORD};
       - MessageBroker__Host=amqp://messagebus:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
@@ -152,6 +178,8 @@ services:
       - "6080:8080"
     depends_on:
       orderingDb:
+        condition: service_healthy
+      messagebus:
         condition: service_healthy
     restart: always
     volumes:
@@ -170,6 +198,14 @@ services:
     depends_on:
        authDb :
         condition: service_healthy
+       messagebus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health-auth"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     restart: always
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
@@ -180,14 +216,20 @@ services:
   basket.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CertPassword}
+
       - ConnectionStrings__DefaultConnection=Host=basketDb;Port=5432;Database=BasketDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ConnectionStrings__Redis=redis:6379 
       - MessageBroker__Host=amqp://messagebus:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
+    
     ports:
       - "6003:8080"
+      - "6053:8081"
     depends_on:
       basketDb :
         condition: service_healthy
@@ -195,7 +237,38 @@ services:
         condition: service_healthy
       messagebus:
         condition: service_healthy
+      catalog.api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health-basket"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     restart: always
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ./certs/dev-cert.pfx:/https/dev-cert.pfx:ro
+
+  payment.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=paymentDb;Port=5432;Database=PaymentDb;Username=${PAYMENT_USERNAME_DB};Password=${PAYMENT_PASSWORD_DB};
+      - MessageBroker__Host=amqp://messagebus:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest     
+    ports:
+      - "6090:8080"
+      - "6091:8081"
+    depends_on:
+      paymentDb:
+        condition : service_healthy
+      messagebus:
+        condition: service_healthy
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
