@@ -1,5 +1,7 @@
 ﻿using BuildingBlocks.Behaviors;
 using BuildingBlocks.EntityFramwork.Interceptors;
+using BuildingBlocks.Infrastracture.Outbox;
+using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -7,17 +9,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Ordering.Application.Data;
 using Ordering.Infrastructure.Data;
 using System.Reflection;
-
 namespace Ordering.Infrastructure
 {
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+
             services.AddScoped<IOrderDbContext, OrderDbContext>();
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-            //services.AddMassTransitWithAssembly(configuration, typeof(BasketCheckOutEventConsumer));
+            services.AddScoped<IOutboxProcessor, OutboxProcessor<OrderDbContext>>();
+
+            services.OutboxServices(configuration);
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg =>
             {
@@ -27,8 +31,9 @@ namespace Ordering.Infrastructure
             services.AddDbContext<OrderDbContext>((sp, opt) =>
             {
                 opt.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+                opt.EnableSensitiveDataLogging();
             })
-                .AddNpgsql<OrderDbContext>(configuration.GetConnectionString("PostgresDefaultConnection"));
+                .AddNpgsql<OrderDbContext>(configuration.GetConnectionString("DefaultConnection"));
 
             return services;
         }
