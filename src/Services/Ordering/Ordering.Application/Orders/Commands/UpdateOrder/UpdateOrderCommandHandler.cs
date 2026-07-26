@@ -1,40 +1,35 @@
-﻿namespace Ordering.Application.Orders.Commands.UpdateOrder
+﻿using Ordering.Application.Factories.OrderStatusFactory;
+
+namespace Ordering.Application.Orders.Commands.UpdateOrder
 {
-    internal sealed class UpdateOrderCommandHandler(IOrderDbContext orderContext) :
-        ICommandHandler<UpdateOrderCommand, Result<OrderDto>>
+    internal sealed class UpdateOrderCommandHandler(
+        IOrderDbContext orderContext,
+        IOrderStatusFactory orderStatusFactory) :
+        ICommandHandler<UpdateOrderCommand, Result<UpdateOrderStatusDto>>
     {
-        public async Task<Result<OrderDto>> Handle(UpdateOrderCommand command, CancellationToken cancellationToken)
+        public async Task<Result<UpdateOrderStatusDto>> Handle(UpdateOrderCommand command, CancellationToken cancellationToken)
         {
-            var orderId = command.OrderDto.Id;
+            var orderId = command.UpdateOrderDto.OrderId;
+
             var order = await orderContext.Orders.FindAsync(orderId, cancellationToken);
 
             if (order is null)
             {
-                return Result<OrderDto>.Failure(
+                return Result<UpdateOrderStatusDto>.Failure(
                     Error.NotFoundError(message: $"Order with Id {orderId} Not Found!"));
             }
 
-            UpdateOrderWithNewValues(order, command.OrderDto);
+            var orderStatus = orderStatusFactory.CreateFromPaymentStatus(command.UpdateOrderDto.PaymentStatus);
 
-            orderContext.Orders.Update(order);
+            order.UpdateOrderStatus(orderStatus);
+
             await orderContext.SaveChangesAsync(cancellationToken);
 
-            return Result<OrderDto>.Success(command.OrderDto);
-        }
+            var result = new UpdateOrderStatusDto(
+                command.UpdateOrderDto.OrderId,
+                command.UpdateOrderDto.PaymentStatus);
 
-        private void UpdateOrderWithNewValues(Order order, OrderDto orderDto)
-        {
-            var updatedPayment = Payment.New(
-                cardName: orderDto.Payment.CardName,
-                cardNumber: orderDto.Payment.CardNumber,
-                expiration: orderDto.Payment.Expiration,
-                cvv: orderDto.Payment.CVV,
-                paymentMethod: orderDto.Payment.PaymentMethod);
-
-            order.Update(
-                orderName: OrderName.New(orderDto.OrderName),
-                orderStatus: orderDto.OrderStatus,
-                payment: updatedPayment);
+            return Result<UpdateOrderStatusDto>.Success(result);
         }
     }
 }
