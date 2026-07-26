@@ -6,5 +6,8 @@
     //}
 
     [StronglyTypedId]
-    public partial struct OrderItemId { }
+    public partial struct OrderItemId
+    {
+        public static OrderItemId New(Guid id) => new OrderItemId(id);
+    }
 }

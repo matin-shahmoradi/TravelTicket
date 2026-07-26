@@ -10,7 +10,8 @@ namespace Ordering.Infrastructure.EntityConfiguration
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Id)
-                .HasConversion(new OrderItemIdConverter());
+                .HasConversion(new OrderItemIdConverter())
+                .ValueGeneratedOnAdd();
             builder.Property(x => x.TicketId)
                 .HasConversion(new TicketIdConverter());
 
