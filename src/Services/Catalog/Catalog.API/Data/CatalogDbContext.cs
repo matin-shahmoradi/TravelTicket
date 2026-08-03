@@ -1,10 +1,11 @@
-﻿using BuildingBlocks.Infrastracture.Outbox;
+﻿using BuildingBlocks.Abstractions;
+using BuildingBlocks.Infrastracture.Outbox;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Catalog.API.Data
 {
-    public class CatalogDbContext : DbContext, ICatalogDbContext
+    public class CatalogDbContext : DbContext, ICatalogDbContext, IUnitOfWork
     {
         public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
         {
@@ -13,6 +14,10 @@ namespace Catalog.API.Data
 
         public DbSet<Ticket> Tickets => Set<Ticket>();
         public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return base.SaveChangesAsync(cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
