@@ -29,7 +29,7 @@ namespace BuildingBlocks.Infrastracture.Outbox.Extensions
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
             var messageType = integrationEvent.GetType();
-            Console.WriteLine($"[OUTBOX-INTEGRATION] {messageType.AssemblyQualifiedName}");
+
             var message = new OutboxMessage
             {
                 Id = integrationEvent.EventId,
@@ -39,9 +39,6 @@ namespace BuildingBlocks.Infrastracture.Outbox.Extensions
             };
 
             outboxMessages.Add(message);
-
-            Console.WriteLine($"[OUTBOX-CREATED] {message.Type}");
-            Console.WriteLine(Environment.StackTrace);
         }
     }
 }
