@@ -1,11 +1,13 @@
-﻿using BuildingBlocks.Infrastracture.Outbox.Extensions;
+﻿using BuildingBlocks.Abstractions;
 using BuildingBlocks.Logger;
 using BuildingBlocks.Messaging.Events.CatalogEvents;
+using Catalog.API.Repository;
 
 namespace Catalog.API.EventHandlers
 {
     public class TicketPriceChangedEventHandler(
-        ICatalogDbContext context,
+        ITicketCommandRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<TicketPriceChangedEventHandler> logger)
         : INotificationHandler<TicketPriceChangedEvent>
     {
@@ -22,8 +24,8 @@ namespace Catalog.API.EventHandlers
             };
             try
             {
-                context.OutboxMessages.AddIntegrationEvent(ticketPriceChangedIntegrationEvent);
-                await context.SaveChangesAsync(cancellationToken);
+                repository.PublishIntegrationEvent(ticketPriceChangedIntegrationEvent);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
                 logger.LogEventHandler(notification.GetType().Name);
             }
             catch (Exception ex)

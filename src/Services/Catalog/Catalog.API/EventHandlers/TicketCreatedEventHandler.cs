@@ -1,11 +1,13 @@
-﻿using BuildingBlocks.Infrastracture.Outbox.Extensions;
+﻿using BuildingBlocks.Abstractions;
 using BuildingBlocks.Logger;
 using BuildingBlocks.Messaging.Events.CatalogEvents;
+using Catalog.API.Repository;
 
 namespace Catalog.API.EventHandlers
 {
     public class TicketCreatedEventHandler(
-        ICatalogDbContext context,
+        ITicketCommandRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<TicketCreatedEventHandler> logger)
         : INotificationHandler<TicketCreatedEvent>
     {
@@ -22,8 +24,8 @@ namespace Catalog.API.EventHandlers
             };
             try
             {
-                context.OutboxMessages.AddIntegrationEvent(integrationEvent);
-                await context.SaveChangesAsync(cancellationToken);
+                repository.PublishIntegrationEvent(integrationEvent);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
                 logger.LogEventHandler(notification.GetType().Name);
             }
             catch (Exception ex)
