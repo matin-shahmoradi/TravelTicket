@@ -13,12 +13,15 @@
                 .NotNull().WithMessage("Destination is required.");
 
             RuleFor(x => x.CreateTicketRequest.Price)
-                .NotEmpty().WithMessage("Price is required.")
                 .GreaterThan(0).WithMessage("Price should be greater then 0.");
 
             RuleFor(x => x.CreateTicketRequest.Date)
                 .NotEmpty().WithMessage("Date cant be empty")
                 .NotNull().WithMessage("Date is required.");
+
+            RuleFor(x => x.CreateTicketRequest.Description)
+                .NotEmpty().WithMessage("Description is required")
+                .NotNull().WithMessage("Description is required");
         }
     }
 }

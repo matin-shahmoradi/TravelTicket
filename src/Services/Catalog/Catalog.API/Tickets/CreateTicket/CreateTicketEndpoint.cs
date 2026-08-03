@@ -9,7 +9,7 @@ namespace Catalog.API.Tickets.CreateTicket
             app.MapPost("/tickets", async (
                 ISender sender,
                 HttpContext context,
-                [FromBody] TicketRequestDTO createRequest) =>
+                [FromBody] CreateTicketRequestDTO createRequest) =>
             {
                 var requestResult = await sender.Send(new CreateTicketCommand(createRequest));
                 if (requestResult.IsSuccess)

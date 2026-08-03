@@ -1,11 +1,20 @@
-﻿using Catalog.API.Domain.ValueObjects;
+﻿using BuildingBlocks.Abstractions;
+using Catalog.API.Domain.ValueObjects;
+using Catalog.API.Repository;
 
 namespace Catalog.API.Tickets.CreateTicket
 {
-    public record CreateTicketCommand(TicketRequestDTO CreateTicketRequest) : ICommand<Result<Guid>>;
+    public record CreateTicketRequestDTO(
+        string Origin,
+        string Destination,
+        string Description,
+        DateTime Date,
+        decimal Price);
+    public record CreateTicketCommand(CreateTicketRequestDTO CreateTicketRequest) : ICommand<Result<Guid>>;
     public sealed class CreateTicketCommandHandler(
-        ICatalogDbContext context,
-        ILogger<CreateTicketCommand> logger)
+        ITicketCommandRepository repository,
+        IUnitOfWork unitOfWork,
+        ILogger<CreateTicketCommandHandler> logger)
         : ICommandHandler<CreateTicketCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(CreateTicketCommand request, CancellationToken cancellationToken)
@@ -23,8 +32,9 @@ namespace Catalog.API.Tickets.CreateTicket
             // Save to database.
             try
             {
-                await context.Tickets.AddAsync(ticket);
-                await context.SaveChangesAsync(cancellationToken);
+                await repository.AddTicketAsync(ticket, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
                 logger.LogInformation("Ticket {id} Created successfully", ticket.Id.Value);
                 return Result<Guid>.Success(ticket.Id.Value);
             }
