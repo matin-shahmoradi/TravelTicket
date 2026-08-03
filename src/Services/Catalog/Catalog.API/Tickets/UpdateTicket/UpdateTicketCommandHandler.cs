@@ -1,33 +1,68 @@
-﻿using Catalog.API.Domain.ValueObjects;
+﻿using BuildingBlocks.Abstractions;
+using Catalog.API.Repository;
 
 namespace Catalog.API.Tickets.UpdateTicket
 {
-    public record UpdateTicketCommand(Guid Id, TicketRequestDTO UpdateTicketRequest) : ICommand<Result<Ticket>>;
-    internal sealed class UpdateTicketCommandHandler(ICatalogDbContext CatalogDb)
+    public record UpdateTicketRequestDTO(
+        string? Origin,
+        string? Destination,
+        string? Description,
+        DateTime? Date,
+        decimal? Price);
+    public record UpdateTicketCommand(Guid Id, UpdateTicketRequestDTO UpdateTicketRequest) : ICommand<Result<Ticket>>;
+    internal sealed class UpdateTicketCommandHandler(
+        ITicketQueryRepository queryRepository,
+        ITicketCommandRepository commandRepository,
+        IUnitOfWork unitOfWork
+        )
         : ICommandHandler<UpdateTicketCommand, Result<Ticket>>
     {
         public async Task<Result<Ticket>> Handle(UpdateTicketCommand command, CancellationToken cancellationToken)
         {
-            var ticket = await CatalogDb.Tickets.FindAsync(TicketId.New(command.Id),cancellationToken);
+            var ticket = await queryRepository.GetTicketById(command.Id);
 
             if (ticket is null)
             {
                 return Result<Ticket>.Failure(Error.NotFoundError(message: "Ticket Not Found!"));
             }
 
-            ticket.Update(
-                origin: command.UpdateTicketRequest.Origin,
-                destination: command.UpdateTicketRequest.Destination,
-                description: command.UpdateTicketRequest.Description,
-                travelDate: command.UpdateTicketRequest.Date,
-                price: command.UpdateTicketRequest.Price
-                );
+            var request = command.UpdateTicketRequest;
 
-            CatalogDb.Tickets.Update(ticket);
-            await CatalogDb.SaveChangesAsync(cancellationToken);
+            if (request.Origin is not null)
+            {
+                ticket.ChangeOrigin(request.Origin);
+            }
 
-            return Result<Ticket>.Success(ticket);
+            if (request.Destination is not null)
+            {
+                ticket.ChangeDestination(request.Destination);
+            }
+
+            if (request.Description is not null)
+            {
+                ticket.ChangeDescription(request.Description);
+            }
+
+            if (request.Price.HasValue)
+            {
+                ticket.ChangePrice(request.Price.Value);
+            }
+
+            if (request.Date.HasValue)
+            {
+                ticket.ChangeTravelDate(request.Date.Value);
+            }
+
+            try
+            {
+                commandRepository.UpdateTicket(ticket);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+                return Result<Ticket>.Success(ticket);
+            }
+            catch (Exception ex)
+            {
+                return Result<Ticket>.Failure(Error.Internal_Server(message: ex.Message));
+            }
         }
-
     }
 }
