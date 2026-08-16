@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var assembly = typeof(Program).Assembly;
 
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddServices(builder.Configuration, builder.Environment);
 
 builder.Host.UseSerilog((context, config) =>
 {
@@ -47,3 +47,8 @@ app.MapGrpcService<CatalogRpcService>();
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
+
+public partial class Program
+{
+
+}
