@@ -142,7 +142,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Host=catalogDb;Port=5432;Database=CatalogDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ConnectionStrings__CatalogDefaultConnection=Host=catalogDb;Port=5432;Database=CatalogDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - MessageBroker__Host=amqp://messagebus:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
