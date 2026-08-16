@@ -7,6 +7,7 @@ using BuildingBlocks.Infrastracture.Outbox;
 using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
 using Catalog.API.EventHandlers;
+using Catalog.API.Repository;
 using Catalog.API.Tickets.CurrentUser;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +22,18 @@ namespace Catalog.API.CatalogExtensions
 {
     public static class CatalogExtension
     {
-        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddServices(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            IHostEnvironment environment)
         {
             var assembly = Assembly.GetExecutingAssembly();
             var jwtSetting = configuration.GetSection("JwtSetting");
+
+            var connectionString =
+                    configuration.GetConnectionString("CatalogDefaultConnection")
+                    ?? throw new InvalidOperationException(
+                        "Catalog Connection string 'CatalogDefaultConnection' was not configured.");
 
             services.AddMediatR(cfg =>
             {
@@ -59,6 +68,7 @@ namespace Catalog.API.CatalogExtensions
                 });
             });
 
+
             // Fluent Validation configuration.
             services.AddValidatorsFromAssembly(assembly);
 
@@ -67,12 +77,15 @@ namespace Catalog.API.CatalogExtensions
             services.AddDbContext<CatalogDbContext>((sp, cfg) =>
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-                cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                cfg.UseNpgsql(configuration.GetConnectionString("CatalogDefaultConnection"));
             });
 
-            services.OutboxServices(configuration);
+            services.OutboxServices(configuration.GetConnectionString("CatalogDefaultConnection")!);
 
-            services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+            services.AddScoped<ICatalogDbContext, CatalogDbContext>();
+            services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CatalogDbContext>());
+            services.AddScoped<ITicketQueryRepository, TicketQueryRepository>();
+            services.AddScoped<ITicketCommandRepository, TicketCommandRepository>();
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.AddScoped<ICurrentUser, CurrentUser>();
@@ -81,7 +94,10 @@ namespace Catalog.API.CatalogExtensions
 
 
             services.AddGrpc();
-            services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
+
+            bool useTestHarness = environment.IsEnvironment("test");
+            services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly(), useTestHarness);
+
             services.AddCorrelationId();
             services.AddExceptionHandler<CustomExceptionHandler>();
 
@@ -93,7 +109,7 @@ namespace Catalog.API.CatalogExtensions
 
             services.AddHealthChecks()
                 .AddNpgSql(
-                    connectionString: configuration.GetConnectionString("DefaultConnection")!,
+                    connectionString: connectionString,
                     name: "postgres",
                     failureStatus: HealthStatus.Unhealthy,
                     tags: new[] { "ready" });
