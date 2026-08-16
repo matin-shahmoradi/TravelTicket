@@ -10,8 +10,22 @@ namespace BuildingBlocks.Messaging.Events
         public static IServiceCollection AddMassTransitWithAssembly(
             this IServiceCollection services,
             IConfiguration configuration,
-            Assembly assembly)
+            Assembly assembly,
+            bool useTestHarness = false)
         {
+
+            if (useTestHarness)
+            {
+                services.AddMassTransitTestHarness(cfg =>
+                {
+                    cfg.AddConsumers(assembly);
+                    cfg.UsingInMemory((context, cfg) =>
+                    {
+                        cfg.ConfigureEndpoints(context);
+                    });
+                });
+                return services;
+            }
             services.AddMassTransit(cfg =>
             {
                 cfg.SetKebabCaseEndpointNameFormatter();
