@@ -21,7 +21,7 @@ namespace Ordering.Infrastructure
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
             services.AddScoped<IOutboxProcessor, OutboxProcessor<OrderDbContext>>();
 
-            services.OutboxServices(configuration);
+            services.OutboxServices(configuration.GetConnectionString("DefaultConnection")!);
             services.AddMassTransitWithAssembly(configuration, Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg =>
             {

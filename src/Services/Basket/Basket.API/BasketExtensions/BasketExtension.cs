@@ -91,7 +91,7 @@ namespace Basket.API.BasketExtensions
                 option.Address = new Uri(configuration["GrpcServices:Catalog"]!);
             });
 
-            services.OutboxServices(configuration);
+            services.OutboxServices(configuration.GetConnectionString("DefaultConnection")!);
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheTicketRepository, CacheTicketRepository>();
