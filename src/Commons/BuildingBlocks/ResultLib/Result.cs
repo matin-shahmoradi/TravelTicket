@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.ResultLib;
+﻿using System.Text.Json.Serialization;
 
 namespace BuildingBlocks
 {
@@ -8,6 +8,14 @@ namespace BuildingBlocks
     /// <typeparam name="T"> T for any type. </typeparam>
     public class Result<T> : BaseResult
     {
+        // This constructor is used by System.Text.Json.
+        [JsonConstructor]
+        public Result(bool isSuccess, T? value, Error? error)
+        {
+            IsSuccess = isSuccess;
+            Value = value;
+            Error = error;
+        }
         private Result(T value)
         {
             IsSuccess = true;

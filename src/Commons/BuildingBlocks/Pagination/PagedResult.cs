@@ -1,7 +1,21 @@
-﻿namespace BuildingBlocks.Pagination
+﻿using System.Text.Json.Serialization;
+
+namespace BuildingBlocks.Pagination
 {
     public sealed class PagedResult<T>
     {
+        [JsonConstructor]
+        public PagedResult(
+            IReadOnlyList<T> items,
+            int pageNumber,
+            int pageSize,
+            long totalCount)
+        {
+            Items = items;
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+            TotalCount = totalCount;
+        }
         public IReadOnlyList<T> Items { get; init; } = [];
         public int PageNumber { get; init; }
         public int PageSize { get; init; }
@@ -12,18 +26,16 @@
         public bool HasPreviousPage => PageNumber > 1;
 
         public static PagedResult<T> CreatePagedResult(
-            IReadOnlyList<T> Items,
+            IReadOnlyList<T> items,
             int pageNumber,
             int pageSize,
             long totalCount)
         {
-            return new PagedResult<T>
-            {
-                Items = Items,
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
+            return new PagedResult<T>(
+                items,
+                pageNumber,
+                pageSize,
+                totalCount);
         }
     }
 }
