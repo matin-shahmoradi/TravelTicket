@@ -1,21 +1,26 @@
-﻿namespace Catalog.API.Tickets.DeleteTicket
+﻿using BuildingBlocks.Extensions;
+
+namespace Catalog.API.Tickets.DeleteTicket
 {
     public class DeleteTicketEndpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("tickets/{id}", async (ISender sender, Guid id) =>
+            app.MapDelete("tickets/{id}", async (
+                HttpContext context,
+                ISender sender,
+                Guid id) =>
             {
-                var ticket = await sender.Send(new DeleteTicketCommand(id));
-                if (ticket.IsSuccess)
-                    Results.NoContent();
+                var result = await sender.Send(new DeleteTicketCommand(id));
+                if (result.IsSuccess)
+                    return Results.NoContent();
 
-                Results.Problem();
+                return result.ToHttpResult(context);
             })
                 .WithName("DeleteTickets")
                 .Produces(StatusCodes.Status204NoContent)
                 .ProducesProblem(StatusCodes.Status404NotFound)
-                .WithSummary("this endpoint used for Delete ticket")
+                .WithSummary("this endpoint used for Delete tickets")
                 .RequireAuthorization("AdminOnly");
         }
     }
