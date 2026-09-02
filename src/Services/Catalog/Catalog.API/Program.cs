@@ -30,10 +30,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 // Configure the HTTP request pipeline
-app.UseHealthChecks("/health-catalog", new HealthCheckOptions
+if (!app.Environment.IsEnvironment("test"))
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+    app.UseHealthChecks("/health-catalog", new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
+}
+
 app.UseBackgroundJobs("catalog-outbox-processor");
 app.UseCorrelationId();
 app.UseAuthentication();
