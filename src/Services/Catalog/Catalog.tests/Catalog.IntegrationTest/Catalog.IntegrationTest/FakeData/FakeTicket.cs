@@ -49,5 +49,18 @@ namespace Catalog.IntegrationTest.FakeData
                     Date: DateTime.SpecifyKind(f.Date.Future(), DateTimeKind.Utc),
                     Price: f.Finance.Amount(2000, 50000)));
         }
+
+        public static Ticket CreateFakeTicket()
+        {
+            return new Faker<Ticket>()
+                .CustomInstantiator(
+                    t => Ticket.Create(
+                       id: new TicketId(t.Random.Guid()),
+                       origin: t.Address.City(),
+                       destination: t.Address.City(),
+                       description: t.Lorem.Text(),
+                       travelDate: DateTime.SpecifyKind(t.Date.Future(), DateTimeKind.Utc),
+                       price: t.Finance.Amount()));
+        }
     }
 }
