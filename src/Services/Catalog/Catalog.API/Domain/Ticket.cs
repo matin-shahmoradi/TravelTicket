@@ -134,5 +134,10 @@ namespace Catalog.API.Models
 
             AddDomainEvents(new TicketPriceChangedEvent(this));
         }
+
+        public void RemoveTicket(Guid id)
+        {
+            AddDomainEvents(new TicketDeletedEvent(id));
+        }
     }
 }

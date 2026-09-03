@@ -28,6 +28,7 @@ namespace Catalog.API.Tickets.DeleteTicket
             }
             try
             {
+                existTicket.RemoveTicket(command.Id);
                 commandRepository.DeleteTicket(existTicket);
                 await uow.SaveChangesAsync(cancellationToken);
 
