@@ -7,7 +7,7 @@ namespace Catalog.API.Repository
     {
         public async Task<Ticket?> GetTicketById(Guid id, CancellationToken cancellationToken = default)
         {
-            return await context.Tickets.FindAsync(id, cancellationToken);
+            return await context.Tickets.FindAsync(TicketId.New(id), cancellationToken);
         }
 
         public async Task<Ticket?> GetTicketByIdWithNoTracking(Guid id, CancellationToken cancellationToken = default)
