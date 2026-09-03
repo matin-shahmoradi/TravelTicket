@@ -13,19 +13,6 @@ namespace BuildingBlocks.Messaging.Events
             Assembly assembly,
             bool useTestHarness = false)
         {
-
-            if (useTestHarness)
-            {
-                services.AddMassTransitTestHarness(cfg =>
-                {
-                    cfg.AddConsumers(assembly);
-                    cfg.UsingInMemory((context, cfg) =>
-                    {
-                        cfg.ConfigureEndpoints(context);
-                    });
-                });
-                return services;
-            }
             services.AddMassTransit(cfg =>
             {
                 cfg.SetKebabCaseEndpointNameFormatter();
