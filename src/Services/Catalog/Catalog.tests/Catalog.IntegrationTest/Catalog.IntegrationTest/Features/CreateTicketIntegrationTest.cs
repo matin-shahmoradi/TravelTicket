@@ -22,7 +22,7 @@ namespace Catalog.IntegrationTest.Features
         }
         public Task InitializeAsync() => Task.CompletedTask;
 
-        public Task DisposeAsync() => _factory.ResetDatabaseAsync();
+        public async Task DisposeAsync() => await _factory.ResetDatabaseAsync();
 
         [Fact]
         public async Task CreateTicket_WithAdminRoke_Returns201()
