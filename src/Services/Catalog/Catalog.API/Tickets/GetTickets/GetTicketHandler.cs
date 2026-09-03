@@ -33,10 +33,13 @@ namespace Catalog.API.Tickets.GetTickets
                     Price: ticket.Price
                 )), cancellationToken);
 
-            if (pagedResult is not null)
-                return Result<PagedResult<TicketDto>>.Success(pagedResult);
 
-            return Result<PagedResult<TicketDto>>.Failure(Error.NotFoundError("ticket not found"));
+            if (pagedResult.TotalCount == 0)
+            {
+                return Result<PagedResult<TicketDto>>.Failure(Error.NotFoundError("tickets not found"));
+            }
+
+            return Result<PagedResult<TicketDto>>.Success(pagedResult);
         }
     }
 }
