@@ -2,11 +2,11 @@
 {
     public class TicketCreatedIntegrationEvent : IntegrationEvent
     {
-        public Guid TicketId { get; set; }
-        public string Origin { get; set; } = default!;
-        public string Destination { get; set; } = default!;
-        public string Description { get; set; } = default!;
-        public DateTime TravelDate { get; set; }
-        public decimal Price { get; set; }
+        public Guid TicketId { get; init; }
+        public string Origin { get; init; } = default!;
+        public string Destination { get; init; } = default!;
+        public string Description { get; init; } = default!;
+        public DateTime TravelDate { get; init; }
+        public decimal Price { get; init; }
     }
 }
