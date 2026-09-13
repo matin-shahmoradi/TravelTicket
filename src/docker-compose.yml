@@ -18,13 +18,16 @@ services:
   messagebus:
     image: rabbitmq:management
 
+  aspire.dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
+
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
       context: .
       dockerfile: Services/Catalog/Catalog.API/Dockerfile
-  seq:
-    image: datalust/seq:latest
+  # seq:
+  #   image: datalust/seq:latest
 
   papercut:
     image: changemakerstudiosus/papercut-smtp:latest
