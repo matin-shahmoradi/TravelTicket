@@ -4,6 +4,7 @@ using BuildingBlocks.EntityFramwork;
 using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.CorrelationId;
 using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.OpenTelemetry;
 using Carter;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -46,6 +47,8 @@ namespace Payment.api
             services.AddCorrelationId();
             services.AddSwaggerGen();
             services.AddCarter();
+
+            services.AddTelemetry("TravelTicket.Payment");
 
             services.AddScoped<ITransactionExecutor, EfTransactionExecutor<PaymentDbContext>>();
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();

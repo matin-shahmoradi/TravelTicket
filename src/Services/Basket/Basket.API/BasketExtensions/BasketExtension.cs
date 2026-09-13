@@ -9,6 +9,7 @@ using BuildingBlocks.Infrastracture.CorrelationId;
 using BuildingBlocks.Infrastracture.Outbox;
 using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.OpenTelemetry;
 using Catalog.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -110,6 +111,7 @@ namespace Basket.API.BasketExtensions
             services.AddSwaggerGen();
             services.AddProblemDetails();
             services.AddCorrelationId();
+            services.AddTelemetry("TravelTicket.Basket");
             services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString: configuration.GetConnectionString("DefaultConnection")!,

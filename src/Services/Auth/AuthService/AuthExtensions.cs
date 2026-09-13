@@ -6,6 +6,7 @@ using AuthService.OptionProperties;
 using AuthService.Options;
 using AuthService.Repositories;
 using BuildingBlocks.Behaviors;
+using BuildingBlocks.OpenTelemetry;
 using Carter;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -105,6 +106,8 @@ namespace AuthService
             services.AddOpenApi();
             services.AddCarter();
 
+
+            services.AddTelemetry("TravelTicket.Auth");
             services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString: configuration.GetConnectionString("DefaultConnection")!,

@@ -4,6 +4,8 @@ using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using Hangfire;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 var assembly = typeof(Program).Assembly;
@@ -11,6 +13,13 @@ var assembly = typeof(Program).Assembly;
 
 builder.Services.AddControllers();
 builder.Services.AddServices(builder.Configuration, builder.Environment);
+
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options
+        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TravelTicket.Basket"))
+        .AddOtlpExporter();
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

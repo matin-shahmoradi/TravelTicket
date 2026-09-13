@@ -108,7 +108,7 @@ namespace Catalog.API.CatalogExtensions
             services.AddHttpContextAccessor();
             services.AddProblemDetails();
 
-            services.AddTelemetry();
+            services.AddTelemetry(serviceName: "TravelTicket.Catalog");
             services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString: connectionString,

@@ -1,3 +1,5 @@
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using Ordering.API;
 using Ordering.Application;
 using Ordering.Infrastructure;
@@ -15,6 +17,12 @@ builder.Services
 builder.Host.UseSerilog((context, config) =>
 {
     config.ReadFrom.Configuration(context.Configuration);
+});
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options
+        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TravelTicket.Ordering"))
+        .AddOtlpExporter();
 });
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

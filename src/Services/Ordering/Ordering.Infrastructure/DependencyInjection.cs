@@ -3,6 +3,7 @@ using BuildingBlocks.EntityFramwork.Interceptors;
 using BuildingBlocks.Infrastracture.Outbox;
 using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.OpenTelemetry;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,7 @@ namespace Ordering.Infrastructure
             })
                 .AddNpgsql<OrderDbContext>(configuration.GetConnectionString("DefaultConnection"));
 
+            services.AddTelemetry("TravelTicket.Ordering");
             return services;
         }
     }
