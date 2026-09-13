@@ -5,17 +5,30 @@ using Catalog.API.Grpc;
 using Hangfire;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using Serilog;
+using Serilog.Sinks.OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var assembly = typeof(Program).Assembly;
+string serviceName = "TravelTicket.Catalog";
 
 builder.Services.AddServices(builder.Configuration, builder.Environment);
 
 builder.Host.UseSerilog((context, config) =>
 {
     config.ReadFrom.Configuration(context.Configuration);
+    config.WriteTo.OpenTelemetry(
+        endpoint: "http://127.0.0.1:18889",
+        protocol: OtlpProtocol.Grpc);
+});
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options
+        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
+        .AddOtlpExporter();
 });
 
 // Add services to the container.

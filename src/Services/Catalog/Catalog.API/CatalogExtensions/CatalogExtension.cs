@@ -6,6 +6,7 @@ using BuildingBlocks.Infrastracture.CorrelationId;
 using BuildingBlocks.Infrastracture.Outbox;
 using BuildingBlocks.Infrastracture.Outbox.Extensions;
 using BuildingBlocks.Messaging.Events;
+using BuildingBlocks.OpenTelemetry;
 using Catalog.API.EventHandlers;
 using Catalog.API.Repository;
 using Catalog.API.Tickets.CurrentUser;
@@ -107,6 +108,7 @@ namespace Catalog.API.CatalogExtensions
             services.AddHttpContextAccessor();
             services.AddProblemDetails();
 
+            services.AddTelemetry();
             services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString: connectionString,
