@@ -26,7 +26,8 @@ namespace BuildingBlocks.OpenTelemetry
                     tracing
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation()
-                        .AddNpgsql();
+                        .AddNpgsql()
+                        .SetSampler(new TraceIdRatioBasedSampler(0.1));
                     tracing.AddOtlpExporter();
                 })
                 .WithLogging(logging => logging.AddOtlpExporter());
