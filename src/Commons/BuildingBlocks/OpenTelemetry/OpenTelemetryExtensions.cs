@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BuildingBlocks.OpenTelemetry.OpenTelemetryProcessors;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -27,7 +28,9 @@ namespace BuildingBlocks.OpenTelemetry
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation()
                         .AddNpgsql()
+                        .AddProcessor(new FilterHangfireQueriesProcessor())
                         .SetSampler(new TraceIdRatioBasedSampler(0.1));
+
                     tracing.AddOtlpExporter();
                 })
                 .WithLogging(logging => logging.AddOtlpExporter());
