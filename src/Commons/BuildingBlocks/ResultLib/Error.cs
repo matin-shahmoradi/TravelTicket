@@ -60,7 +60,7 @@
         public static Error Internal_Server(
             string message = "Internal server error occured!",
             int code = 500,
-            ErrorType errorType = ErrorType.CUSTOM_ERROR)
+            ErrorType errorType = ErrorType.INTERNAL_SERVER_ERROR)
         {
             return new Error(message, code, errorType);
         }
