@@ -53,6 +53,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.15.0" />
     <PackageReference Include="Testcontainers.RabbitMq" Version="4.15.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="4.15.0" />
     <PackageReference Include="WebMotions.Fake.Authentication.JwtBearer" Version="10.0.0" />
     <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
   </ItemGroup>
