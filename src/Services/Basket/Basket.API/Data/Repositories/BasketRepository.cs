@@ -2,7 +2,7 @@
 
 namespace Basket.API.Data.Repository
 {
-    public class BasketRepository(BacketDbContext DbContext)
+    public class BasketRepository(BasketDbContext DbContext)
         : IBasketRepository
     {
         public async Task<ShoppingCart?> GetBasket(Guid customerId, QueryTrackingBehavior tracking, CancellationToken cancellation)

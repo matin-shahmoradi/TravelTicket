@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Basket.API.Migrations
 {
-    [DbContext(typeof(BacketDbContext))]
+    [DbContext(typeof(BasketDbContext))]
     [Migration("20260710132110_add_version")]
     partial class add_version
     {

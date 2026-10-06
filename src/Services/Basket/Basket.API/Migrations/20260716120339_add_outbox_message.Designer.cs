@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Basket.API.Migrations
 {
-    [DbContext(typeof(BacketDbContext))]
+    [DbContext(typeof(BasketDbContext))]
     [Migration("20260716120339_add_outbox_message")]
     partial class add_outbox_message
     {

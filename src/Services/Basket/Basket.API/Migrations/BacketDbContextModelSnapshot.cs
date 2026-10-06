@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Basket.API.Migrations
 {
-    [DbContext(typeof(BacketDbContext))]
+    [DbContext(typeof(BasketDbContext))]
     partial class BacketDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
