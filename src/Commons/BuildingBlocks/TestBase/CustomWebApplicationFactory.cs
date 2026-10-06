@@ -10,6 +10,7 @@ using Respawn;
 using System.Data.Common;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
+using Testcontainers.Redis;
 using Xunit;
 
 namespace BuildingBlocks.TestBase
@@ -33,8 +34,14 @@ namespace BuildingBlocks.TestBase
             .WithUsername("guest")
             .WithPassword("guest")
             .Build();
+
+        private readonly RedisContainer _redisContainer =
+            new RedisBuilder("redis")
+            .Build();
+
         private DbConnection _dbConnection = null!;
         private Respawner _respawner = null!;
+        protected string _redisConnectionString => _redisContainer.GetConnectionString();
         public IServiceProvider serviceProvider => this.Services;
         public HttpClient HttpClient { get; private set; } = null!;
 
@@ -42,7 +49,7 @@ namespace BuildingBlocks.TestBase
         {
             await _dbContainer.StartAsync();
             await _rabbitMqContainer.StartAsync();
-
+            await _redisContainer.StartAsync();
             await ApplyMigrationAsync();
 
             _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
@@ -59,6 +66,7 @@ namespace BuildingBlocks.TestBase
             await _dbContainer.DisposeAsync();
             await _dbConnection.CloseAsync();
             await _rabbitMqContainer.DisposeAsync();
+            await _redisContainer.DisposeAsync();
         }
 
         public async Task ResetDatabaseAsync()
@@ -141,7 +149,12 @@ namespace BuildingBlocks.TestBase
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("test");
+            // catalog connection strings
             Environment.SetEnvironmentVariable("ConnectionStrings:CatalogDefaultConnection", _dbContainer.GetConnectionString());
+            // basket connection strings
+            Environment.SetEnvironmentVariable("ConnectionStrings:DefaultConnection", _dbContainer.GetConnectionString());
+            Environment.SetEnvironmentVariable("ConnectionStrings:Redis", _redisContainer.GetConnectionString());
+
             builder.ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
