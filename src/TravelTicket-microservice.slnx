@@ -12,6 +12,7 @@
     <Project Path="Services/Basket/Basket.API/Basket.API.csproj" Id="3fb28921-0546-4f50-af15-0fe9f2ef89ac" />
   </Folder>
   <Folder Name="/Services/Basket/test/">
+    <Project Path="Services/Basket/Test/Basket.IntegrationTests/Basket.IntegrationTests.csproj" Id="c46cd3f6-03ac-4956-8caf-35cbecf0cc04" />
     <Project Path="Services/Basket/Test/Basket.UnitTests/Basket.UnitTests.csproj" Id="2934c968-2557-4666-8bfd-5c10d0d163ca" />
   </Folder>
   <Folder Name="/Services/Catalog/">
