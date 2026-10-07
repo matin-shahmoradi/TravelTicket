@@ -2,28 +2,25 @@
 using Basket.API.Data.Repositories;
 using Basket.API.Grpc;
 using BuildingBlocks.Abstractions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 
 namespace Basket.API.Basket.AddItemToBasket
 {
     internal sealed class AddItemToBasketCommandHandler(
-        BacketDbContext basketContext,
         IBasketRepository basketRepository,
         IDistributedCache distributedCache,
         ICacheTicketRepository cache,
         ICurrentUser currentUser,
         ICatalogGrpcClient grpcClient,
+        IUnitOfWork unitOfWork,
         ILogger<AddItemToBasketCommandHandler> logger
         )
         : ICommandHandler<AddItemToBasketCommand, Result<ShoppingCartDto>>
     {
         public async Task<Result<ShoppingCartDto>> Handle(AddItemToBasketCommand command, CancellationToken cancellationToken)
         {
-            var basket = await basketContext.ShoppingCarts
-                .Include(x => x.Items)
-                .FirstOrDefaultAsync(x => x.CustomerId == currentUser.UserId, cancellationToken);
+            var basket = await basketRepository.GetBasket(currentUser.UserId);
 
             if (basket is null)
             {
@@ -34,8 +31,7 @@ namespace Basket.API.Basket.AddItemToBasket
             var ticketResult = await GetTicketWithFallbackAsync(command.AddItemToBasketDto.TicketId, cancellationToken);
             if (!ticketResult.IsSuccess)
             {
-                if (!ticketResult.IsSuccess)
-                    return Result<ShoppingCartDto>.Failure(ticketResult.Error!.Value);
+                return Result<ShoppingCartDto>.Failure(ticketResult.Error!.Value);
             }
             var ticket = ticketResult.Value;
 
@@ -44,7 +40,7 @@ namespace Basket.API.Basket.AddItemToBasket
                 quantity: command.AddItemToBasketDto.Quantity,
                 price: ticket.Price);
 
-            await basketContext.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Invalidate cache
             await distributedCache.RemoveAsync(currentUser.UserId.ToString()!);
@@ -62,16 +58,22 @@ namespace Basket.API.Basket.AddItemToBasket
 
             if (cachedItem is not null)
             {
-                var ticket = JsonSerializer.Deserialize<TicketReadModel>(cachedItem);
-
-                if (ticket is null)
+                try
                 {
-                    logger.LogError("Failed to deserialize cached ticket. TicketId: {TicketId}", ticketId);
-                    return Result<TicketReadModel>.Failure(
-                        Error.Internal_Server("Failed to deserialize cached ticket"));
-                }
+                    var ticket = JsonSerializer.Deserialize<TicketReadModel>(cachedItem);
+                    if (ticket is null)
+                    {
+                        logger.LogError("Failed to deserialize cached ticket. TicketId: {TicketId}", ticketId);
+                        return Result<TicketReadModel>.Failure(
+                            Error.Internal_Server("Failed to deserialize cached ticket"));
+                    }
 
-                return Result<TicketReadModel>.Success(ticket);
+                    return Result<TicketReadModel>.Success(ticket);
+                }
+                catch (JsonException ex)
+                {
+                    return Result<TicketReadModel>.Failure(Error.Internal_Server(message: ex.Message));
+                }
             }
 
             logger.LogInformation("Cache miss for ticket {TicketId}. Calling Catalog gRPC.", ticketId);

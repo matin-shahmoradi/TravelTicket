@@ -2,7 +2,7 @@
 
 namespace Basket.API.Data.Repository
 {
-    public class BasketRepository(BacketDbContext DbContext)
+    public class BasketRepository(BasketDbContext DbContext)
         : IBasketRepository
     {
         public async Task<ShoppingCart?> GetBasket(Guid customerId, QueryTrackingBehavior tracking, CancellationToken cancellation)
@@ -25,10 +25,11 @@ namespace Basket.API.Data.Repository
         }
         public async Task<bool> DeleteBasket(Guid customerId, CancellationToken cancellation)
         {
-            var cart = await DbContext.ShoppingCarts.FirstOrDefaultAsync(x => x.CustomerId == customerId);
-            DbContext.ShoppingCarts.Remove(cart);
-            await DbContext.SaveChangesAsync(cancellation);
-            return true;
+            var deletedCount = await DbContext.ShoppingCarts
+                .Where(x => x.CustomerId == customerId)
+                .ExecuteDeleteAsync(cancellation);
+
+            return deletedCount > 0;
         }
     }
 }

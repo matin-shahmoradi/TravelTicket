@@ -2,7 +2,7 @@
 
 namespace Basket.API.Basket.UpdateItemPriceInBasket
 {
-    public class UpdateItemPriceBasketCommandHandler(BacketDbContext basketDb) 
+    public class UpdateItemPriceBasketCommandHandler(BasketDbContext basketDb) 
         : ICommandHandler<UpdateItemPriceBasketCommand, Result<bool>>
     {
         public async Task<Result<bool>> Handle(UpdateItemPriceBasketCommand command, CancellationToken cancellationToken)

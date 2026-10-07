@@ -5,7 +5,10 @@ using System.Text.Json;
 
 namespace Basket.API.Basket.StoreBasket
 {
+    [Obsolete("Use AddItemToBasketCommand")]
     public record StoreBasketCommand(BasketRequest BasketDto) : ICommand<Result<ShoppingCartDto>>;
+
+    [Obsolete("Use AddItemToBasketCommandHandler")]
     internal sealed class StoreBasketCommandHandler(
         IBasketRepository basketRepository,
         ICacheTicketRepository ticketRepository,

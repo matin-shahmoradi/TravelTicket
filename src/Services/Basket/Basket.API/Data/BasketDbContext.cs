@@ -5,9 +5,9 @@ using System.Reflection;
 
 namespace Basket.API.Data
 {
-    public class BacketDbContext : DbContext, IBasketDbContext
+    public class BasketDbContext : DbContext, IBasketDbContext
     {
-        public BacketDbContext(DbContextOptions<BacketDbContext> options) : base(options)
+        public BasketDbContext(DbContextOptions<BasketDbContext> options) : base(options)
         {
 
         }

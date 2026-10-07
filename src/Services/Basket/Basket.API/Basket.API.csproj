@@ -42,5 +42,9 @@
 <ItemGroup>
 		<protobuf Include="..\..\..\Commons\BuildingBlocks\Contracts\Protos\Catalog.proto" GrpcServices="Client" />
 </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Basket.UnitTests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
 
 </Project>

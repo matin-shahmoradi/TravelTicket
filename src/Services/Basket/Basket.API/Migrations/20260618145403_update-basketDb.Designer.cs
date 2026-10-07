@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Basket.API.Migrations
 {
-    [DbContext(typeof(BacketDbContext))]
+    [DbContext(typeof(BasketDbContext))]
     [Migration("20260618145403_update-basketDb")]
     partial class updatebasketDb
     {

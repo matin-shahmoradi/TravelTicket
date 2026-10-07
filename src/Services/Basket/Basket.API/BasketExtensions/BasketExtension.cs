@@ -36,7 +36,7 @@ namespace Basket.API.BasketExtensions
             });
             services.AddScoped<ISaveChangesInterceptor, AuditInterceptor>();
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventInterceptor>();
-            services.AddDbContext<BacketDbContext>((sp, cfg) =>
+            services.AddDbContext<BasketDbContext>((sp, cfg) =>
             {
                 cfg.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
@@ -99,12 +99,12 @@ namespace Basket.API.BasketExtensions
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ICatalogGrpcClient, CatalogGrpcClient>();
 
-            services.AddScoped<IUnitOfWork, UnitOfWork<BacketDbContext>>();
-            services.AddScoped<IBasketDbContext, BacketDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork<BasketDbContext>>();
+            services.AddScoped<IBasketDbContext, BasketDbContext>();
             services.Decorate<IBasketRepository, CachedBasketRepository>();
 
-            services.AddScoped<ITransactionExecutor, EfTransactionExecutor<BacketDbContext>>();
-            services.AddScoped<IOutboxProcessor, OutboxProcessor<BacketDbContext>>();
+            services.AddScoped<ITransactionExecutor, EfTransactionExecutor<BasketDbContext>>();
+            services.AddScoped<IOutboxProcessor, OutboxProcessor<BasketDbContext>>();
 
             services.AddCarter();
             services.AddValidatorsFromAssembly(assembly);
@@ -131,7 +131,7 @@ namespace Basket.API.BasketExtensions
         public static async Task MigrateDatabase(this WebApplication app)
         {
             using var scoped = app.Services.CreateScope();
-            var context = scoped.ServiceProvider.GetRequiredService<BacketDbContext>();
+            var context = scoped.ServiceProvider.GetRequiredService<BasketDbContext>();
 
             await context.Database.MigrateAsync();
         }
