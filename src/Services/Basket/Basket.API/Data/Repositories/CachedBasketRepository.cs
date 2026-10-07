@@ -1,5 +1,4 @@
 ﻿using Basket.API.Common.Dtos.MapExtensions;
-using BuildingBlocks.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
@@ -8,8 +7,7 @@ namespace Basket.API.Data.Repository
 {
     public class CachedBasketRepository(
         IBasketRepository basketRepository,
-        IDistributedCache cache,
-        ICurrentUser currentUser)
+        IDistributedCache cache)
         : IBasketRepository
     {
         public async Task<ShoppingCart?> GetBasket(Guid customerId, QueryTrackingBehavior tracking = QueryTrackingBehavior.NoTracking, CancellationToken cancellation = default)
@@ -23,7 +21,7 @@ namespace Basket.API.Data.Repository
                         cancellation: cancellation
                         );
             }
-            var cachedBasketJson = await cache.GetStringAsync(currentUser.UserId.ToString()!, cancellation);
+            var cachedBasketJson = await cache.GetStringAsync(customerId.ToString(), cancellation);
 
             if (!string.IsNullOrEmpty(cachedBasketJson))
             {
@@ -50,7 +48,7 @@ namespace Basket.API.Data.Repository
             var storeBasket = await basketRepository.StoreBasket(basket, cancellation);
 
             var dto = storeBasket.MapToShoppingCartDto();
-            await cache.SetStringAsync(currentUser.UserId.ToString(), JsonSerializer.Serialize(dto));
+            await cache.SetStringAsync(basket.CustomerId.ToString(), JsonSerializer.Serialize(dto));
 
             return storeBasket;
         }
