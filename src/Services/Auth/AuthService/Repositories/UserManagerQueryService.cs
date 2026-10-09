@@ -1,18 +1,18 @@
-﻿using AuthService.Data;
-using AuthService.Interfaces;
+﻿using AuthService.Interfaces;
 using AuthService.Model;
 using AuthService.Model.DTOs.UserDtos;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Repositories
 {
     public class UserManagerQueryService(
-        AuthDbContext authDbContext)
+        UserManager<ApplicationUser> userManager)
         : IUserManagerQueryService
     {
         public async Task<IReadOnlyList<UserResponseDto>> GetUsersAsync(CancellationToken cancellationToken)
         {
-            return await authDbContext
+            return await userManager
                 .Users
                 .AsNoTracking()
                 .Select(x => new UserResponseDto
@@ -25,16 +25,20 @@ namespace AuthService.Repositories
                     LastName = x.LastName
                 }).ToListAsync(cancellationToken);
         }
-        public async Task<ApplicationUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken = default)
         {
-            return await authDbContext.Users
+            return await userManager.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        }
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId, bool isTracking = true, CancellationToken cancellationToken = default)
+        {
+            return await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
         }
 
         public async Task<ApplicationUser?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
         {
-            return await authDbContext.Users
+            return await userManager.Users
                 .Where(x => x.Email == email)
                 .FirstOrDefaultAsync(cancellationToken);
         }
@@ -42,7 +46,7 @@ namespace AuthService.Repositories
         public async Task<bool> IsEmailUniqueAsync(string email, CancellationToken cancellationToken)
         {
             var normalizedEmail = email.ToUpperInvariant();
-            return !await authDbContext.Users
+            return !await userManager.Users
                 .AsNoTracking()
                 .AnyAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
         }

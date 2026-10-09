@@ -13,7 +13,7 @@ namespace AuthService.Auth.ConfirmEmail
     {
         public async Task<Result<string>> Handle(ConfirmEmailCommand command, CancellationToken cancellationToken)
         {
-            var user = await userManagerQueryService.GetUserByIdAsync(command.UserId, cancellationToken);
+            var user = await userManagerQueryService.GetUserByIdAsync(command.UserId, true, cancellationToken);
             if (user is null)
                 return Result<string>.Failure(Error.NotFoundError(message: "User not found!"));
 
