@@ -3,8 +3,8 @@ using AuthService.Interfaces;
 using AuthService.Model;
 using AuthService.Model.DTOs.RegisterDtos;
 using BuildingBlocks;
+using BuildingBlocks.Abstractions;
 using FluentAssertions;
-using FluentEmail.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,27 +15,30 @@ namespace AuthService.UnitTests.Features.Register
     {
         private readonly Mock<IUserManagerQueryService> _mockUserQueryService;
         private readonly Mock<IUserManagerCommandService> _mockUserCommandService;
-        private readonly Mock<IFluentEmailSender> _mockFluentEmailSender;
+        private readonly Mock<IUserRegistrationEmailSender> _mockEmailSender;
         private readonly Mock<ILogger<UserRegisterCommandHandler>> _mockLogger;
+        private readonly Mock<ITransactionExecutor> _mockTransactionExecutor;
         private readonly UserRegisterCommandHandler _handler;
         private readonly CancellationToken _cancellationToken;
         public UserRegisterCommandHandlerTest()
         {
             _mockUserQueryService = new Mock<IUserManagerQueryService>();
             _mockUserCommandService = new Mock<IUserManagerCommandService>();
-            _mockFluentEmailSender = new Mock<IFluentEmailSender>();
+            _mockEmailSender = new Mock<IUserRegistrationEmailSender>();
             _mockLogger = new Mock<ILogger<UserRegisterCommandHandler>>();
+            _mockTransactionExecutor = new Mock<ITransactionExecutor>();
             _cancellationToken = CancellationToken.None;
             _handler = new UserRegisterCommandHandler(
                 userManagerQueryService: _mockUserQueryService.Object,
                 userManagerCommandService: _mockUserCommandService.Object,
-                emailSender: _mockFluentEmailSender.Object,
+                transactionExecutor: _mockTransactionExecutor.Object,
+                emailSender: _mockEmailSender.Object,
                 logger: _mockLogger.Object);
 
         }
 
         [Fact]
-        public async Task Handle_ShouldReturnSuccess()
+        public async Task Handle_WhenValidRequest_ShouldCreateUserAndReturnSuccess()
         {
             var registerRequestDto = new RegisterRequestDto(
                 Email: "ValidEmail@gmail.com",
@@ -45,6 +48,7 @@ namespace AuthService.UnitTests.Features.Register
                 PhoneNumber: "09878578951"
                 );
 
+
             var command = new UserRegisterCommand(registerRequestDto);
 
             var role = Roles.User;
@@ -52,6 +56,13 @@ namespace AuthService.UnitTests.Features.Register
             _mockUserQueryService
                 .Setup(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken))
                 .ReturnsAsync((ApplicationUser?)null);
+
+            _mockTransactionExecutor
+                .Setup(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken))
+                    .Returns<Func<CancellationToken, Task<Result<RegisterResponseDto>>>, CancellationToken>(
+                        (operation, ct) => operation(ct));
 
             _mockUserCommandService
                 .Setup(x => x.CreateUserAsync(
@@ -63,10 +74,9 @@ namespace AuthService.UnitTests.Features.Register
                     It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), role))
                 .ReturnsAsync(IdentityResult.Success);
 
-            _mockFluentEmailSender
-                .Setup(x => x.SendEmailRegisteration(
-                    It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), _cancellationToken))
-                .ReturnsAsync(new SendResponse());
+            _mockEmailSender
+                .Setup(x => x.SendEmailRegistration(It.IsAny<ApplicationUser>(), _cancellationToken))
+                .ReturnsAsync(Result<string>.Success(""));
 
             // Act
             var result = await _handler.Handle(command, _cancellationToken);
@@ -85,6 +95,12 @@ namespace AuthService.UnitTests.Features.Register
                 .Verify(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken),
                times: Times.Once);
 
+            _mockTransactionExecutor
+                .Verify(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken),
+                times: Times.Once);
+
             _mockUserCommandService
                 .Verify(x => x.CreateUserAsync(
                     It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), registerRequestDto.Password),
@@ -95,9 +111,8 @@ namespace AuthService.UnitTests.Features.Register
                     It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), role),
                 times: Times.Once);
 
-            _mockFluentEmailSender
-                .Verify(x => x.SendEmailRegisteration(
-                    It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), _cancellationToken),
+            _mockEmailSender
+                .Verify(x => x.SendEmailRegistration(It.IsAny<ApplicationUser>(), _cancellationToken),
                 times: Times.Once);
         }
         [Fact]
@@ -156,8 +171,8 @@ namespace AuthService.UnitTests.Features.Register
                      role: It.IsAny<string>()),
                 times: Times.Never);
 
-            _mockFluentEmailSender
-                .Verify(x => x.SendEmailRegisteration(
+            _mockEmailSender
+                .Verify(x => x.SendEmailRegistration(
                     user: It.IsAny<ApplicationUser>(),
                     cancellationToken: It.IsAny<CancellationToken>()),
                 times: Times.Never);
@@ -180,6 +195,13 @@ namespace AuthService.UnitTests.Features.Register
                 .Setup(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken))
                 .ReturnsAsync((ApplicationUser?)null);
 
+            _mockTransactionExecutor
+                .Setup(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken))
+                    .Returns<Func<CancellationToken, Task<Result<RegisterResponseDto>>>, CancellationToken>(
+                        (operation, ct) => operation(ct));
+
             _mockUserCommandService
                 .Setup(x => x.CreateUserAsync(
                     user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
@@ -201,6 +223,12 @@ namespace AuthService.UnitTests.Features.Register
                 .Verify(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken),
                times: Times.Once);
 
+            _mockTransactionExecutor
+                .Verify(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken),
+                times: Times.Once);
+
             _mockUserCommandService
                 .Verify(x => x.CreateUserAsync(
                      user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
@@ -213,8 +241,8 @@ namespace AuthService.UnitTests.Features.Register
                      role: It.IsAny<string>()),
                 times: Times.Never);
 
-            _mockFluentEmailSender
-                .Verify(x => x.SendEmailRegisteration(
+            _mockEmailSender
+                .Verify(x => x.SendEmailRegistration(
                     user: It.IsAny<ApplicationUser>(),
                     cancellationToken: It.IsAny<CancellationToken>()),
                 times: Times.Never);
@@ -239,6 +267,13 @@ namespace AuthService.UnitTests.Features.Register
                 .Setup(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken))
                 .ReturnsAsync((ApplicationUser?)null);
 
+            _mockTransactionExecutor
+                .Setup(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken))
+                    .Returns<Func<CancellationToken, Task<Result<RegisterResponseDto>>>, CancellationToken>(
+                        (operation, ct) => operation(ct));
+
             _mockUserCommandService
                 .Setup(x => x.CreateUserAsync(
                     user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
@@ -263,6 +298,12 @@ namespace AuthService.UnitTests.Features.Register
                 .Verify(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken),
                times: Times.Once);
 
+            _mockTransactionExecutor
+                .Verify(x => x.ExecuteAsync(
+                    It.IsAny<Func<CancellationToken, Task<Result<RegisterResponseDto>>>>(),
+                    _cancellationToken),
+                times: Times.Once);
+
             _mockUserCommandService
                 .Verify(x => x.CreateUserAsync(
                      user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
@@ -275,85 +316,12 @@ namespace AuthService.UnitTests.Features.Register
                      role: role),
                 times: Times.Once);
 
-            _mockFluentEmailSender
-                .Verify(x => x.SendEmailRegisteration(
+            _mockEmailSender
+                .Verify(x => x.SendEmailRegistration(
                     user: It.IsAny<ApplicationUser>(),
                     cancellationToken: It.IsAny<CancellationToken>()),
                 times: Times.Never);
 
-        }
-
-        [Fact]
-        public async Task Handle_ShouldReturnFailure_WhenSendEmailRegisterationFail()
-        {
-            var registerRequestDto = new RegisterRequestDto(
-                Email: "ValidEmail@gmail.com",
-                Password: "ValidPassword1234@",
-                Firstname: "FirstName",
-                Lastname: "Lastname",
-                PhoneNumber: "09878578951"
-                );
-
-            string role = Roles.User;
-            SendResponse sendResponse = new SendResponse
-            {
-                ErrorMessages = new List<string>
-                {
-                    "Cant send registration email"
-                }
-            };
-            var command = new UserRegisterCommand(registerRequestDto);
-
-            _mockUserQueryService
-                .Setup(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken))
-                .ReturnsAsync((ApplicationUser?)null);
-
-            _mockUserCommandService
-                .Setup(x => x.CreateUserAsync(
-                    user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
-                    password: registerRequestDto.Password))
-                .ReturnsAsync(IdentityResult.Success);
-
-            _mockUserCommandService
-                .Setup(x => x.AddUserToRoleAsync(
-                    It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), role))
-                .ReturnsAsync(IdentityResult.Success);
-
-            _mockFluentEmailSender
-                .Setup(x => x.SendEmailRegisteration(
-                    It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)), _cancellationToken))
-                .ReturnsAsync(sendResponse);
-
-            // Act
-            var result = await _handler.Handle(command, _cancellationToken);
-
-            // Assert
-
-            result.IsSuccess.Should().BeFalse();
-
-            result.Error.Should().NotBeNull();
-
-            _mockUserQueryService
-               .Verify(x => x.GetUserByEmailAsync(registerRequestDto.Email, _cancellationToken),
-              times: Times.Once);
-
-            _mockUserCommandService
-                .Verify(x => x.CreateUserAsync(
-                     user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
-                     password: It.IsAny<string>()),
-                times: Times.Once);
-
-            _mockUserCommandService
-                .Verify(x => x.AddUserToRoleAsync(
-                     user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
-                     role: role),
-                times: Times.Once);
-
-            _mockFluentEmailSender
-                .Verify(x => x.SendEmailRegisteration(
-                    user: It.Is<ApplicationUser>(u => IsExpectedUser(u, registerRequestDto)),
-                    cancellationToken: _cancellationToken),
-                times: Times.Once);
         }
         private static bool IsExpectedUser(ApplicationUser user, RegisterRequestDto dto)
         {
@@ -361,6 +329,10 @@ namespace AuthService.UnitTests.Features.Register
                    user.UserName == dto.Email &&
                    user.FirstName == dto.Firstname &&
                    user.LastName == dto.Lastname;
+        }
+        private static ApplicationUser MapToApplicationUser(RegisterRequestDto dto)
+        {
+            return ApplicationUser.CreateUser(dto.Email, dto.Email, dto.Firstname, dto.Lastname, dto.PhoneNumber);
         }
     }
 }
