@@ -46,6 +46,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                 .Setup(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken))
                 .ReturnsAsync(user);
 
@@ -69,6 +70,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                .Verify(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken),
                   Times.Once);
 
@@ -93,6 +95,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                 .Setup(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken))
                 .ReturnsAsync((ApplicationUser?)null);
 
@@ -111,6 +114,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                .Verify(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken),
                   Times.Once);
 
@@ -141,6 +145,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                 .Setup(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken))
                 .ReturnsAsync(user);
 
@@ -165,6 +170,7 @@ namespace AuthService.UnitTests.Features.ConfirmEmail
             _mockUserQueryService
                .Verify(x => x.GetUserByIdAsync(
                     userId: userId,
+                    isTracking: true,
                     cancellationToken: _cancellationToken),
                   Times.Once);
 
