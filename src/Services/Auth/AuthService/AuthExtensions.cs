@@ -5,7 +5,10 @@ using AuthService.Model;
 using AuthService.OptionProperties;
 using AuthService.Options;
 using AuthService.Repositories;
+using AuthService.Services.Email;
+using BuildingBlocks.Abstractions;
 using BuildingBlocks.Behaviors;
+using BuildingBlocks.EntityFramwork;
 using BuildingBlocks.OpenTelemetry;
 using Carter;
 using FluentValidation;
@@ -24,7 +27,8 @@ namespace AuthService
     {
         public static IServiceCollection AuthServices(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IWebHostEnvironment environment)
         {
             services.AddControllers();
 
@@ -35,6 +39,10 @@ namespace AuthService
             services.AddDbContext<AuthDbContext>(cfg =>
             {
                 cfg.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                if (environment.IsDevelopment())
+                {
+                    cfg.EnableSensitiveDataLogging();
+                }
             });
 
             services.AddIdentityCore<ApplicationUser>(cfg =>
@@ -61,6 +69,9 @@ namespace AuthService
             services.AddScoped<IUserSignInManagerService, UserSignInManagerService>();
             services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();
             services.AddScoped<IFluentEmailSender, FluentEmailSender>();
+            services.AddScoped<IMailKitEmailSender, MailKitEmailSender>();
+            services.AddScoped<IUserRegistrationEmailSender, EmailRegistrationSender>();
+            services.AddScoped<ITransactionExecutor, EfTransactionExecutor<AuthDbContext>>();
             services.AddSwaggerGen();
 
             services.AddMediatR(cfg =>

@@ -9,7 +9,7 @@ using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AuthServices(builder.Configuration);
+builder.Services.AuthServices(builder.Configuration, builder.Environment);
 builder.Host.UseSharedSerilog(builder.Configuration);
 builder.Logging.AddOpenTelemetry(options =>
 {

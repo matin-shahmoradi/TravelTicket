@@ -2,6 +2,7 @@
 using AuthService.Model;
 using AuthService.Model.DTOs.RegisterDtos;
 using BuildingBlocks;
+using BuildingBlocks.Abstractions;
 using BuildingBlocks.CQRS;
 
 namespace AuthService.Auth.Register
@@ -9,7 +10,8 @@ namespace AuthService.Auth.Register
     public class UserRegisterCommandHandler(
         IUserManagerQueryService userManagerQueryService,
         IUserManagerCommandService userManagerCommandService,
-        IFluentEmailSender emailSender,
+        IUserRegistrationEmailSender emailSender,
+        ITransactionExecutor transactionExecutor,
         ILogger<UserRegisterCommandHandler> logger)
         : ICommandHandler<UserRegisterCommand, Result<RegisterResponseDto>>
     {
@@ -28,34 +30,37 @@ namespace AuthService.Auth.Register
                 lastname: command.Request.Lastname,
                 phoneNumber: command.Request.PhoneNumber);
 
-
-            var createUser = await userManagerCommandService.CreateUserAsync(newUser, command.Request.Password);
-
-            if (!createUser.Succeeded)
-                return Result<RegisterResponseDto>.Failure(Error.CustomError());
-
-
-            var addUserToRole = await userManagerCommandService.AddUserToRoleAsync(newUser, Roles.User);
-            if (!addUserToRole.Succeeded)
-                return Result<RegisterResponseDto>
-                    .Failure(Error.Internal_Server(message: $" Cant assign user with id {newUser.Id} to {Roles.User} role"));
-
-            var emailValidationResponse = await emailSender.SendEmailRegisteration(newUser, cancellationToken);
-
-            if (!emailValidationResponse.Successful)
+            var result = await transactionExecutor.ExecuteAsync(async cancellationToken =>
             {
-                logger.LogError(
-                    "Verification email sending failed. UserId: {UserId}, Email: {Email}, Errors: {@Errors}",
-                    newUser.Id,
-                    newUser.Email,
-                    emailValidationResponse.ErrorMessages
-                    );
-                return Result<RegisterResponseDto>.Failure(
-                    Error.Internal_Server(message: $"failed to send verification email : {emailValidationResponse.ErrorMessages}"));
-            }
-            var userRegisterResult = new RegisterResponseDto(command.Request.Email, $"{command.Request.Firstname} {command.Request.Lastname}");
+                var createUser = await userManagerCommandService.CreateUserAsync(newUser, command.Request.Password);
 
-            return Result<RegisterResponseDto>.Success(userRegisterResult);
+                if (!createUser.Succeeded)
+                    return Result<RegisterResponseDto>.Failure(Error.CustomError());
+
+
+                var addUserToRole = await userManagerCommandService.AddUserToRoleAsync(newUser, Roles.User);
+                if (!addUserToRole.Succeeded)
+                    return Result<RegisterResponseDto>
+                        .Failure(Error.Internal_Server(message: $" Cant assign user with id {newUser.Id} to {Roles.User} role"));
+
+                var emailValidationResponse = await emailSender.SendEmailRegistration(newUser, cancellationToken);
+
+                if (!emailValidationResponse.IsSuccess)
+                {
+                    logger.LogError(
+                        "Failed to send verification email. UserId: {UserId}, Email: {Email}",
+                        newUser.Id,
+                        newUser.Email
+                        );
+                    return Result<RegisterResponseDto>.Failure(
+                        Error.Internal_Server(message: $"failed to send verification email : {emailValidationResponse.Error!.Value.Message}"));
+                }
+                var userRegisterResult = new RegisterResponseDto(command.Request.Email, $"{command.Request.Firstname} {command.Request.Lastname}");
+
+                return Result<RegisterResponseDto>.Success(userRegisterResult);
+            });
+
+            return result;
         }
     }
 }

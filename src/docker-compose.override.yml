@@ -129,13 +129,23 @@ services:
       retries: 10
       start_period: 20s
     
-  papercut:
-    image: changemakerstudiosus/papercut-smtp:latest
-    container_name: paperCut
+  # papercut:
+  #   image: changemakerstudiosus/papercut-smtp:latest
+  #   container_name: paperCut
+  #   ports:
+  #     - "8080:8080"
+  #     - "2526:2525"
+  #   restart: always
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    environment:
+      MP_MAX_MESSAGES: 5000
     ports:
-      - "8080:8080"
-      - "2526:2525"
-    restart: always
+      - "8025:8025"
+      - "2525:1025"
+    restart : unless-stopped
 
   aspire.dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:13

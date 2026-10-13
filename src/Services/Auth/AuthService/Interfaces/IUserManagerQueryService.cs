@@ -7,6 +7,7 @@ namespace AuthService.Interfaces
     {
         Task<IReadOnlyList<UserResponseDto>> GetUsersAsync(CancellationToken cancellationToken);
         Task<ApplicationUser?> GetUserByIdAsync(string userId, CancellationToken cancellationToken);
+        Task<ApplicationUser?> GetUserByIdAsync(string userId, bool isTracking = true, CancellationToken cancellationToken = default);
         Task<ApplicationUser?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
         Task<bool> IsEmailUniqueAsync(string email, CancellationToken cancellationToken);
     }

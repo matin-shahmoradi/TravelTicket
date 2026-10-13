@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.Text;
 
-namespace AuthService.Repositories
+namespace AuthService.Services.Email
 {
     public class FluentEmailSender : IFluentEmailSender
     {

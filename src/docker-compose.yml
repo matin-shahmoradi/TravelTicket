@@ -29,8 +29,11 @@ services:
   # seq:
   #   image: datalust/seq:latest
 
-  papercut:
-    image: changemakerstudiosus/papercut-smtp:latest
+  # papercut:
+  #   image: changemakerstudiosus/papercut-smtp:latest
+
+  mailPit:
+    image: axllent/mailpit:latest
 
   ordering.api:
     image: ${DOCKER_REGISTRY-}orderingapi
