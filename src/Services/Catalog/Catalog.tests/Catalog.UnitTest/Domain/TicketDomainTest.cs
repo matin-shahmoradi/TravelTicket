@@ -1,6 +1,6 @@
 ﻿using Catalog.API.Domain.Exception;
 using Catalog.API.Domain.ValueObjects;
-using Catalog.API.Events;
+using Catalog.API.Events.TicketEvents;
 using Catalog.API.Models;
 using FluentAssertions;
 

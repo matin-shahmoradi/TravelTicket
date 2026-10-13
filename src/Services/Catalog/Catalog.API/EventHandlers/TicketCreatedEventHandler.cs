@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Abstractions;
 using BuildingBlocks.Logger;
 using BuildingBlocks.Messaging.Events.CatalogEvents;
+using Catalog.API.Events.TicketEvents;
 using Catalog.API.Repository;
 
 namespace Catalog.API.EventHandlers
